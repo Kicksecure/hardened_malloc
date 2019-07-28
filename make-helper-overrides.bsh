@@ -9,4 +9,3 @@ make_install_hook_post() {
    fi
    cp libhardened_malloc.so "$DESTDIR/usr/lib/libhardened_malloc.so/libhardened_malloc.so"
 }
-
