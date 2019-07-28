@@ -1,3 +1,107 @@
+commit 6cda93e9592705318e085fba9d58b107f3e9caa9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 19:26:15 2019 +0000
+
+    copyright
+
+commit fae85f41074f4b60873fa7a771a9fabc8b851898
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 19:25:40 2019 +0000
+
+    correct copyright year
+
+commit 1618da1e91cdfcb356cd24b43acdc892a96f41ec
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 19:25:23 2019 +0000
+
+    minor
+
+commit b3b5e5d21de582e9e126bb49ce0d36c55a3f0619
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 19:20:03 2019 +0000
+
+    add SONAME - https://github.com/GrapheneOS/hardened_malloc/issues/86
+    
+    use correct Section: libs rather than misc
+    
+    compatiblity with dh_dwz / dwz - https://github.com/GrapheneOS/hardened_malloc/issues/85
+    
+    move to sub folder /usr/lib/libhardened_malloc.so so lintian will not complain
+    about non-versioned shared objects and missing symlinks. That extra complexity
+    is not needed here since this lib aims to be compatible with what it replaces.
+    
+    full path is now /usr/lib/libhardened_malloc.so/libhardened_malloc.so
+    
+    deprecate no longer needed make_all_hook_post as this was improved in genmkfile
+
+commit ccfb42c5b479c7dee38ef6eec66cd96ee6955e51
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 18:48:52 2019 +0000
+
+    actually only CFLAGS, CPPFLAGS and LDFLAGS
+    
+    https://github.com/GrapheneOS/hardened_malloc/pull/92
+    
+    https://github.com/GrapheneOS/hardened_malloc/pull/91#issuecomment-515784158
+
+commit b6685b29a162fa10b4bdd193b2295bede5ead6a1
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 18:20:17 2019 +0000
+
+    keep existing environment variables
+    
+    such as CFLAGS, CPPFLAGS, LDFLAGS
+    
+    https://github.com/GrapheneOS/hardened_malloc/pull/91
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/88
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/85
+
+commit 131b1ebd78bc3e9f87376e3832846f9983779271
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:29:20 2019 +0000
+
+    simplify genmkfile appendix
+
+commit 3a27245fca16e0fb244b45d77c1961e907ca9083
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Jul 23 01:23:57 2019 +0000
+
+    lower verbosity
+
+commit 3fc23f8bfde30994d5b72c68b3dd4ab4ce27ed7e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 23:43:23 2019 +0000
+
+    lower debian/changelog versions during development
+
+commit 4a286a9d0e6fcc91205ede7e794684c772180707
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 23:03:31 2019 +0000
+
+    set CONFIG_NATIVE=false to not optimize for build machine
+
+commit dc599bf62d6fa9ad328e4fecf2cc6812497c1a50
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 12:05:53 2019 -0400
+
+    fortunately no need to use versioned shared object file names
+    
+    https://www.debian.org/doc/debian-policy/ch-sharedlibs.html
+
+commit b8fa714be73ff4ec9059e9be3abaab248b74024e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 12:01:12 2019 -0400
+
+    move genmkfile appendix to bottom instead of top to not break the default make target
+
+commit 4c00e74d456691b8faf9a5f9950ef9844a42e160
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 22 01:15:34 2019 +0000
+
+    bumped changelog version
+
 commit f7d78bba9c706b339ac8c9b46288d1703cd86482
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 21 01:25:40 2019 +0000
