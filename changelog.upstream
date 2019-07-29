@@ -1,3 +1,15 @@
+commit eb39b494d618a86a241449ada701357a7321143f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 13:01:05 2019 +0000
+
+    add README_generic.md
+
+commit a963ac8a3497f1f979f38877a3f2cbc5a6b53686
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Jul 28 19:30:10 2019 +0000
+
+    bumped changelog version
+
 commit 6cda93e9592705318e085fba9d58b107f3e9caa9
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 28 19:26:15 2019 +0000
