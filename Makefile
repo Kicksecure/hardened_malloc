@@ -1,3 +1,4 @@
+CONFIG_WERROR := true
 CONFIG_NATIVE := true
 CONFIG_CXX_ALLOCATOR := true
 CONFIG_UBSAN := false
@@ -21,11 +22,17 @@ CONFIG_N_ARENA := 4
 CONFIG_STATS := false
 
 define safe_flag
-$(shell $(CC) -E $1 - </dev/null >/dev/null 2>&1 && echo $1 || echo $2)
+$(shell $(CC) $(if $(filter clang,$(CC)),-Werror=unknown-warning-option) -E $1 - </dev/null >/dev/null 2>&1 && echo $1 || echo $2)
 endef
 
 CPPFLAGS := $(CPPFLAGS) -D_GNU_SOURCE
-SHARED_FLAGS := -O3 -flto -fPIC -fvisibility=hidden $(call safe_flag,-fno-plt) $(call safe_flag,-fstack-clash-protection) -fstack-protector-strong -pipe -Wall -Wextra $(call safe_flag,-Wcast-align=strict) -Wcast-qual -Wwrite-strings
+SHARED_FLAGS := -O3 -flto -fPIC -fvisibility=hidden $(call safe_flag,-fno-plt) \
+    $(call safe_flag,-fstack-clash-protection) -fstack-protector-strong -pipe -Wall -Wextra \
+    $(call safe_flag,-Wcast-align=strict,-Wcast-align) -Wcast-qual -Wwrite-strings
+
+ifeq ($(CONFIG_WERROR),true)
+    SHARED_FLAGS += -Werror
+endif
 
 ifeq ($(CONFIG_NATIVE),true)
     SHARED_FLAGS += -march=native
@@ -33,25 +40,27 @@ endif
 
 CFLAGS := $(CFLAGS) -std=c11 $(SHARED_FLAGS) -Wmissing-prototypes
 CXXFLAGS := $(call safe_flag,-std=c++17,-std=c++14) $(SHARED_FLAGS)
-LDFLAGS := $(LDFLAGS) -Wl,-soname=libhardened_malloc.so,--as-needed,-z,defs,-z,relro,-z,now,-z,nodlopen,-z,text
-TIDY_CHECKS := -checks=bugprone-*,-bugprone-macro-parentheses,cert-*,clang-analyzer-*,readability-*,-readability-inconsistent-declaration-parameter-name,-readability-magic-numbers,-readability-named-parameter,-bugprone-too-small-loop-variable
+LDFLAGS := $(LDFLAGS) -Wl,--as-needed,-z,defs,-z,relro,-z,now,-z,nodlopen,-z,text
 
 SOURCES := chacha.c h_malloc.c memory.c pages.c random.c util.c
 OBJECTS := $(SOURCES:.c=.o)
 
 ifeq ($(CONFIG_CXX_ALLOCATOR),true)
-    LDLIBS += -lstdc++
+    # make sure LTO is compatible in case CC and CXX don't match (such as clang and g++)
+    CXX := $(CC)
+    LDLIBS += -lstdc++ -lgcc_s
+
     SOURCES += new.cc
     OBJECTS += new.o
 endif
 
 ifeq ($(CONFIG_UBSAN),true)
-    CFLAGS += -fsanitize=undefined
-    CXXFLAGS += -fsanitize=undefined
+    CFLAGS += -fsanitize=undefined -fno-sanitize-recover=undefined
+    CXXFLAGS += -fsanitize=undefined -fno-sanitize-recover=undefined
 endif
 
-ifeq ($(CONFIG_SEAL_METADATA),true)
-    CPPFLAGS += -DCONFIG_SEAL_METADATA
+ifeq (,$(filter $(CONFIG_SEAL_METADATA),true false))
+    $(error CONFIG_SEAL_METADATA must be true or false)
 endif
 
 ifeq (,$(filter $(CONFIG_ZERO_ON_FREE),true false))
@@ -83,6 +92,7 @@ ifeq (,$(filter $(CONFIG_STATS),true false))
 endif
 
 CPPFLAGS += \
+    -DCONFIG_SEAL_METADATA=$(CONFIG_SEAL_METADATA) \
     -DZERO_ON_FREE=$(CONFIG_ZERO_ON_FREE) \
     -DWRITE_AFTER_FREE_CHECK=$(CONFIG_WRITE_AFTER_FREE_CHECK) \
     -DSLOT_RANDOMIZE=$(CONFIG_SLOT_RANDOMIZE) \
@@ -112,19 +122,12 @@ pages.o: pages.c pages.h memory.h util.h
 random.o: random.c random.h chacha.h util.h
 util.o: util.c util.h
 
+check: tidy
+
 tidy:
-	clang-tidy $(TIDY_CHECKS) $(SOURCES) -- $(CPPFLAGS)
+	clang-tidy $(SOURCES) -- $(CPPFLAGS)
 
 clean:
 	rm -f libhardened_malloc.so $(OBJECTS)
 
-.PHONY: clean tidy
-
-## genmkfile
-## https://github.com/Whonix/genmkfile
-GENMKFILE_PATH := $(strip $(wildcard /usr/share/genmkfile))
-GENMKFILE_ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-export GENMKFILE_PATH
-export GENMKFILE_ROOT_DIR
--include $(GENMKFILE_PATH)/makefile-full
-## end genmkfile
+.PHONY: check clean tidy
