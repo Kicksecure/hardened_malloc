@@ -10,7 +10,6 @@ DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/buildflags.mk
 
 CC  := clang
-CXX := clang++
 
 %:
 	dh $@
@@ -19,4 +18,4 @@ override_dh_installchangelogs:
 	dh_installchangelogs changelog.upstream upstream
 
 override_dh_auto_build:
-	dh_auto_build -- CONFIG_NATIVE=false CC=$(CC) CXX=$(CXX)
+	dh_auto_build -- CONFIG_NATIVE=false CC=$(CC)
