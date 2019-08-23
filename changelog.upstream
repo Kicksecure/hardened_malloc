@@ -1,3 +1,49 @@
+commit 3510356893dfb495dc1609034bd6721d1af54233
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 18 14:26:52 2019 +0000
+
+    reappend genmkfile
+
+commit cd1840ea6c6cd81c0d8221f156f95f649a5c5b7b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 18 14:21:34 2019 +0000
+
+    setting CXX no longer required
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/94#issuecomment-522303543
+
+commit d054defaf0d2ed061b782fedb0c459bfd1b96f8d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 18 14:20:43 2019 +0000
+
+    revert to Makefile by upstream
+
+commit 4b859c81c5eeb7ef7cb782e961401789c1f01278
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 18 08:50:33 2019 +0000
+
+    add Build-Depends: clang-tidy
+    
+    to support "make test" which calls "make tidy"
+
+commit c0ed18686e2657bf95536b01ffdfc957e51a58e4
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Aug 18 03:24:48 2019 +0000
+
+    port to build with clang instead
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/94
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/89
+    
+    https://github.com/GrapheneOS/hardened_malloc/pull/90
+
+commit a4b3f55a43532bf377bfd67f55160fc02ac54415
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Aug 1 11:41:37 2019 +0000
+
+    bumped changelog version
+
 commit e039114f3119e665b575e347fb84590154775ddd
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 1 11:13:39 2019 +0000
