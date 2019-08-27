@@ -1,5 +1,27 @@
 # Hardened malloc
 
+* [Introduction](#introduction)
+* [Dependencies](#dependencies)
+* [Testing](#testing)
+* [OS integration](#os-integration)
+    * [Android-based operating systems](#android-based-operating-systems)
+    * [Traditional Linux-based operating systems](#traditional-linux-based-operating-systems)
+* [Configuration](#configuration)
+* [Core design](#core-design)
+* [Security properties](#security-properties)
+* [Randomness](#randomness)
+* [Size classes](#size-classes)
+* [Scalability](#scalability)
+    * [Small (slab) allocations](#small-slab-allocations)
+        * [Thread caching (or lack thereof)](#thread-caching-or-lack-thereof)
+    * [Large allocations](#large-allocations)
+* [Memory tagging](#memory-tagging)
+* [API extensions](#api-extensions)
+* [Stats](#stats)
+* [System calls](#system-calls)
+
+## Introduction
+
 This is a security-focused general purpose memory allocator providing the
 malloc API along with various extensions. It provides substantial hardening
 against heap corruption vulnerabilities. The security-focused design also leads
@@ -20,17 +42,17 @@ and can cover the same use cases.
 This allocator is intended as a successor to a previous implementation based on
 extending OpenBSD malloc with various additional security features. It's still
 heavily based on the OpenBSD malloc design, albeit not on the existing code
-other than reusing the hash table implementation for the time being. The main
-differences in the design are that it is solely focused on hardening rather
-than finding bugs, uses finer-grained size classes along with slab sizes going
-beyond 4k to reduce internal fragmentation, doesn't rely on the kernel having
-fine-grained mmap randomization and only targets 64-bit to make aggressive use
-of the large address space.  There are lots of smaller differences in the
-implementation approach. It incorporates the previous extensions made to
-OpenBSD malloc including adding padding to allocations for canaries (distinct
-from the current OpenBSD malloc canaries), write-after-free detection tied to
-the existing clearing on free, queues alongside the existing randomized arrays
-for quarantining allocations and proper double-free detection for quarantined
+other than reusing the hash table implementation. The main differences in the
+design are that it's solely focused on hardening rather than finding bugs, uses
+finer-grained size classes along with slab sizes going beyond 4k to reduce
+internal fragmentation, doesn't rely on the kernel having fine-grained mmap
+randomization and only targets 64-bit to make aggressive use of the large
+address space. There are lots of smaller differences in the implementation
+approach. It incorporates the previous extensions made to OpenBSD malloc
+including adding padding to allocations for canaries (distinct from the current
+OpenBSD malloc canaries), write-after-free detection tied to the existing
+clearing on free, queues alongside the existing randomized arrays for
+quarantining allocations and proper double-free detection for quarantined
 allocations. The per-size-class memory regions with their own random bases were
 loosely inspired by the size and type-based partitioning in PartitionAlloc. The
 planned changes to OpenBSD malloc ended up being too extensive and invasive so
@@ -56,7 +78,7 @@ there will be custom integration offering better performance in the future
 along with other hardening for the C standard library implementation.
 
 For Android, only current generation Android Open Source Project branches will
-be supported, which currently means pie-qpr2-release.
+be supported, which currently means pie-qpr3-release and pie-qpr3-b-release.
 
 ## Testing
 
@@ -79,6 +101,60 @@ this allocator offers across different size classes. The intention is that this
 will be offered as part of hardened variants of the Bionic and musl C standard
 libraries.
 
+## OS integration
+
+### Android-based operating systems
+
+On GrapheneOS, hardened\_malloc is integrated into the standard C library as
+the standard malloc implementation. Other Android-based operating systems can
+reuse [the integration
+code](https://github.com/GrapheneOS/platform_bionic/commit/20160b81611d6f2acd9ab59241bebeac7cf1d71c)
+to provide it. If desired, jemalloc can be left as a runtime configuration
+option by only conditionally using hardened\_malloc to give users the choice
+between performance and security. However, this reduces security for threat
+models where persistent state is untrusted, i.e. verified boot and attestation
+(see the [attestation sister project](https://attestation.app/about)).
+
+Make sure to raise `vm.max_map_count` substantially too to accomodate the very
+large number of guard pages created by hardened\_malloc. This can be done in
+`init.rc` (`system/core/rootdir/init.rc`) near the other virtual memory
+configuration:
+
+    write /proc/sys/vm/max_map_count 524240
+
+This is unnecessary if you set `CONFIG_GUARD_SLABS_INTERVAL` to a very large
+value in the build configuration.
+
+### Traditional Linux-based operating systems
+
+On traditional Linux-based operating systems, hardened\_malloc can either be
+integrated into the libc implementation as a replacement for the standard
+malloc implementation or loaded as a dynamic library. Rather rebuilding each
+executable to be linked against it, it can be added as a preloaded library to
+`/etc/ld.so.preload`. For example, with `libhardened_malloc.so` installed to
+`/usr/local/lib/libhardened_malloc.so`, add that full path as a line to the
+`/etc/ld.so.preload` configuration file:
+
+    /usr/local/lib/libhardened_malloc.so
+
+The format of this configuration file is a whitespace-separated list, so it's
+good practice to put each library on a separate line.
+
+Using the `LD_PRELOAD` environment variable to load it on a case-by-case basis
+will not work when `AT_SECURE` is set such as with setuid binaries. It's also
+generally not a recommended approach for production usage. The recommendation
+is to enable it globally and make exceptions for performance critical cases by
+running the application in a container / namespace without it enabled.
+
+Make sure to raise `vm.max_map_count` substantially too to accomodate the very
+large number of guard pages created by hardened\_malloc. As an example, in
+`/etc/sysctl.d/hardened_malloc.conf`:
+
+    vm.max_map_count = 524240
+
+This is unnecessary if you set `CONFIG_GUARD_SLABS_INTERVAL` to a very large
+value in the build configuration.
+
 ## Configuration
 
 You can set some configuration options at compile-time via arguments to the
@@ -93,6 +169,11 @@ even with all the optional features disabled.
 
 The following boolean configuration options are available:
 
+* `CONFIG_WERROR`: `true` (default) or `false` to control whether compiler
+  warnings are treated as errors. This is highly recommended, but it can be
+  disabled to avoid patching the Makefile if a compiler version not tested by
+  the project is being used and has warnings. Investigating these warnings is
+  still recommended and the intention is to always be free of any warnings.
 * `CONFIG_NATIVE`: `true` (default) or `false` to control whether the code is
   optimized for the detected CPU on the host. If this is disabled, setting up a
   custom `-march` higher than the baseline architecture is highly recommended
@@ -105,12 +186,15 @@ The following boolean configuration options are available:
   allocations are zeroed on free, to mitigate use-after-free and uninitialized
   use vulnerabilities along with purging lots of potentially sensitive data
   from the process as soon as possible. This has a performance cost scaling to
-  the size of the allocation, which is usually acceptable.
+  the size of the allocation, which is usually acceptable. This is not relevant
+  to large allocations because the pages are given back to the kernel.
 * `CONFIG_WRITE_AFTER_FREE_CHECK`: `true` (default) or `false` to control
-  sanity checking that new allocations contain zeroed memory. This can detect
-  writes caused by a write-after-free vulnerability and mixes well with the
-  features for making memory reuse randomized / delayed. This has a performance
-  cost scaling to the size of the allocation, which is usually acceptable.
+  sanity checking that new small allocations contain zeroed memory. This can
+  detect writes caused by a write-after-free vulnerability and mixes well with
+  the features for making memory reuse randomized / delayed. This has a
+  performance cost scaling to the size of the allocation, which is usually
+  acceptable. This is not relevant to large allocations because they're always
+  a fresh memory mapping from the kernel.
 * `CONFIG_SLOT_RANDOMIZE`: `true` (default) or `false` to randomize selection
   of free slots within slabs. This has a measurable performance cost and isn't
   one of the important security features, but the cost has been deemed more
@@ -127,9 +211,9 @@ The following boolean configuration options are available:
 * `CONFIG_SEAL_METADATA`: `true` or `false` (default) to control whether Memory
   Protection Keys are used to disable access to all writable allocator state
   outside of the memory allocator code. It's currently disabled by default due
-  to being extremely experimental and a significant performance cost for this
-  use case on current generation hardware, which may become drastically lower
-  in the future. Whether or not this feature is enabled, the metadata is all
+  to lack of regular testing and a significant performance cost for this use
+  case on current generation hardware, which may become drastically lower in
+  the future. Whether or not this feature is enabled, the metadata is all
   contained within an isolated memory region with high entropy random guard
   regions around it.
 
@@ -150,62 +234,90 @@ The following integer configuration options are available:
   becomes 1024 for 16 byte allocations with 16kiB as the largest size class, or
   8192 with 128kiB as the largest).
 * `CONFIG_GUARD_SLABS_INTERVAL`: `1` (default) to control the number of slabs
-  before a slab is skipped and left as an unused memory protected guard slab
+  before a slab is skipped and left as an unused memory protected guard slab.
+  The default of `1` leaves a guard slab between every slab. This feature does
+  not have a *direct* performance cost, but it makes the address space usage
+  sparser which can indirectly hurt performance. The kernel also needs to track
+  a lot more memory mappings, which uses a bit of extra memory and slows down
+  memory mapping and memory protection changes in the process. The kernel uses
+  O(log n) algorithms for this and system calls are already fairly slow anyway,
+  so having many extra mappings doesn't usually add up to a significant cost.
 * `CONFIG_GUARD_SIZE_DIVISOR`: `2` (default) to control the maximum size of the
   guard regions placed on both sides of large memory allocations, relative to
-  the usable size of the memory allocation
+  the usable size of the memory allocation.
 * `CONFIG_REGION_QUARANTINE_RANDOM_LENGTH`: `128` (default) to control the
   number of slots in the random array used to randomize region reuse for large
-  memory allocations
+  memory allocations.
 * `CONFIG_REGION_QUARANTINE_QUEUE_LENGTH`: `1024` (default) to control the
   number of slots in the queue used to delay region reuse for large memory
-  allocations
+  allocations.
 * `CONFIG_REGION_QUARANTINE_SKIP_THRESHOLD`: `33554432` (default) to control
-  the size threshold where large allocations will not be quarantined
+  the size threshold where large allocations will not be quarantined.
 * `CONFIG_FREE_SLABS_QUARANTINE_RANDOM_LENGTH`: `32` (default) to control the
-  number of slots in the random array used to randomize free slab reuse
+  number of slots in the random array used to randomize free slab reuse.
 * `CONFIG_CLASS_REGION_SIZE`: `34359738368` (default) to control the size of
-  the size class regions
+  the size class regions.
 * `CONFIG_N_ARENA`: `1` (default) to control the number of arenas
 * `CONFIG_STATS`: `false` (default) to control whether stats on allocation /
-  deallocation count and active allocations are tracked. This is currently only
-  exposed via the mallinfo APIs on Android.
+  deallocation count and active allocations are tracked. See the [section on
+  stats](#stats) for more details.
 * `CONFIG_EXTENDED_SIZE_CLASSES`: `true` (default) to control whether small
   size class go up to 128kiB instead of the minimum requirement for avoiding
   memory waste of 16kiB. The option to extend it even further will be offered
-  in the future when better support for larger slab allocations is added.
+  in the future when better support for larger slab allocations is added. See
+  the [section on size classes](#size-classes) below for details.
 * `CONFIG_LARGE_SIZE_CLASSES`: `true` (default) to control whether large
   allocations use the slab allocation size class scheme instead of page size
-  granularity (see the section on size classes below)
+  granularity. See the [section on size classes](#size-classes) below for
+  details.
 
 There will be more control over enabled features in the future along with
 control over fairly arbitrarily chosen values like the size of empty slab
 caches (making them smaller improves security and reduces memory usage while
 larger caches can substantially improves performance).
 
-## Basic design
+## Core design
 
-The current design is very simple and will become a bit more sophisticated as
-the basic features are completed and the implementation is hardened and
-optimized. The allocator is exclusive to 64-bit platforms in order to take full
-advantage of the abundant address space without being constrained by needing to
-keep the design compatible with 32-bit.
+The core design of the allocator is very simple / minimalist. The allocator is
+exclusive to 64-bit platforms in order to take full advantage of the abundant
+address space without being constrained by needing to keep the design
+compatible with 32-bit.
+
+The mutable allocator state is entirely located within a dedicated metadata
+region, and the allocator is designed around this approach for both small
+(slab) allocations and large allocations. This provides reliable, deterministic
+protections against invalid free including double frees, and protects metadata
+from attackers. Traditional allocator exploitation techniques do not work with
+the hardened\_malloc implementation.
 
 Small allocations are always located in a large memory region reserved for slab
-allocations. It can be determined that an allocation is one of the small size
-classes from the address range. Each small size class has a separate reserved
-region within the larger region, and the size of a small allocation can simply
-be determined from the range. Each small size class has a separate out-of-line
-metadata array outside of the overall allocation region, with the index of the
-metadata struct within the array mapping to the index of the slab within the
-dedicated size class region. Slabs are a multiple of the page size and are
-page aligned. The entire small size class region starts out memory protected
-and becomes readable / writable as it gets allocated, with idle slabs beyond
-the cache limit having their pages dropped and the memory protected again.
+allocations. On free, it can be determined that an allocation is one of the
+small size classes from the address range. If arenas are enabled, the arena is
+also determined from the address range as each arena has a dedicated sub-region
+in the slab allocation region. Arenas provide totally independent slab
+allocators with their own allocator state and no coordination between them.
+Once the base region is determined (simply the slab allocation region as a
+whole without any arenas enabled), the size class is determined from the
+address range too, since it's divided up into a sub-region for each size class.
+There's a top level slab allocation region, divided up into arenas, with each
+of those divided up into size class regions. The size class regions each have a
+random base within a large guard region. Once the size class is determined, the
+slab size is known, and the index of the slab is calculated and used to obtain
+the slab metadata for the slab from the slab metadata array. Finally, the index
+of the slot within the slab provides the index of the bit tracking the slot in
+the bitmap. Every slab allocation slot has a dedicated bit in a bitmap tracking
+whether it's free, along with a separate bitmap for tracking allocations in the
+quarantine. The slab metadata entries in the array have intrusive lists
+threaded through them to track partial slabs (partially filled, and these are
+the first choice for allocation), empty slabs (limited amount of cached free
+memory) and free slabs (purged / memory protected).
 
 Large allocations are tracked via a global hash table mapping their address to
-their size and guard size. They're simply memory mappings and get mapped on
-allocation and then unmapped on free.
+their size and random guard size. They're simply memory mappings and get mapped
+on allocation and then unmapped on free. Large allocations are the only dynamic
+memory mappings made by the allocator, since the address space for allocator
+state (including both small / large allocation metadata) and slab allocations
+is statically reserved.
 
 This allocator is aimed at production usage, not aiding with finding and fixing
 memory corruption bugs for software development. It does find many latent bugs
@@ -270,6 +382,7 @@ was a bit less important and if a core goal was finding latent bugs.
 * Slab allocations are zeroed on free
 * Detection of write-after-free for slab allocations by verifying zero filling
   is intact at allocation time
+* Delayed free via a combination of FIFO and randomization for slab allocations
 * Large allocations are purged and memory protected on free with the memory
   mapping kept reserved in a quarantine to detect use-after-free
     * The quarantine is primarily based on a FIFO ring buffer, with the oldest
@@ -280,7 +393,6 @@ was a bit less important and if a core goal was finding latent bugs.
       of the quarantine
 * Memory in fresh allocations is consistently zeroed due to it either being
   fresh pages or zeroed on free after previous usage
-* Delayed free via a combination of FIFO and randomization for slab allocations
 * Random canaries placed after each slab allocation to *absorb*
   and then later detect overflows/underflows
     * High entropy per-slab random values
@@ -289,8 +401,9 @@ was a bit less important and if a core goal was finding latent bugs.
   size class regions interspersed with guard pages
 * Zero size allocations are a dedicated size class with the entire region
   remaining non-readable and non-writable
-* Extension for retrieving the size of allocations with fallback
-  to a sentinel for pointers not managed by the allocator
+* Extension for retrieving the size of allocations with fallback to a sentinel
+  for pointers not managed by the allocator [in-progress, full implementation
+  needs to be ported from the previous OpenBSD malloc-based allocator]
     * Can also return accurate values for pointers *within* small allocations
     * The same applies to pointers within the first page of large allocations,
       otherwise it currently has to return a sentinel
@@ -464,7 +577,7 @@ to finding the per-size-class metadata. The part that's still open to different
 design choices is how arenas are assigned to threads. One approach is
 statically assigning arenas via round-robin like the standard jemalloc
 implementation, or statically assigning to a random arena which is essentially
-the current implementation.  Another option is dynamic load balancing via a
+the current implementation. Another option is dynamic load balancing via a
 heuristic like `sched_getcpu` for per-CPU arenas, which would offer better
 performance than randomly choosing an arena each time while being more
 predictable for an attacker. There are actually some security benefits from
@@ -475,7 +588,7 @@ varying usage of size classes.
 When there's substantial allocation or deallocation pressure, the allocator
 does end up calling into the kernel to purge / protect unused slabs by
 replacing them with fresh `PROT_NONE` regions along with unprotecting slabs
-when partially filled and cached empty slabs are depleted.  There will be
+when partially filled and cached empty slabs are depleted. There will be
 configuration over the amount of cached empty slabs, but it's not entirely a
 performance vs. memory trade-off since memory protecting unused slabs is a nice
 opportunistic boost to security. However, it's not really part of the core
@@ -590,38 +703,38 @@ reuse after a certain number of allocation cycles. Similarly to the initial tag
 generation, tag values for adjacent allocations will be skipped by incrementing
 past them.
 
-For example, consider this slab of allocations that are not yet used with 16
+For example, consider this slab of allocations that are not yet used with 15
 representing the tag for free memory. For the sake of simplicity, there will be
 no quarantine or other slabs for this example:
 
-    | 16 | 16 | 16 | 16 | 16 | 16 |
+    | 15 | 15 | 15 | 15 | 15 | 15 |
 
 Three slots are randomly chosen for allocations, with random tags assigned (2,
-15, 7) since these slots haven't ever been used and don't have saved values:
+7, 14) since these slots haven't ever been used and don't have saved values:
 
-    | 16 | 2  | 16 | 15 |  7 | 16 |
+    | 15 | 2  | 15 | 7  | 14 | 15 |
 
 The 2nd allocation slot is freed, and is set back to the tag for free memory
-(16), but with the previous tag value stored in the freed space:
+(15), but with the previous tag value stored in the freed space:
 
-    | 16 | 16 | 16 | 7  | 15 | 16 |
+    | 15 | 15 | 15 | 7  | 14 | 15 |
 
 The first slot is allocated for the first time, receiving the random value 3:
 
-    | 3  | 16 | 16 | 7  | 15 | 16 |
+    | 3  | 15 | 15 | 7  | 14 | 15 |
 
 The 2nd slot is randomly chosen again, so the previous tag (2) is retrieved and
 incremented to 3 as part of the use-after-free mitigation. An adjacent
 allocation already uses the tag 3, so the tag is further incremented to 4 (it
 would be incremented to 5 if one of the adjacent tags was 4):
 
-    | 3  | 4  | 16 | 7  | 15 | 16 |
+    | 3  | 4  | 15 | 7  | 14 | 15 |
 
 The last slot is randomly chosen for the next alocation, and is assigned the
-random value 15. However, it's placed next to an allocation with the tag 15 so
+random value 14. However, it's placed next to an allocation with the tag 14 so
 the tag is incremented and wraps around to 0:
 
-    | 3  | 4  | 16 | 7  | 15 | 0 |
+    | 3  | 4  | 15 | 7  | 14 | 0  |
 
 ## API extensions
 
@@ -649,6 +762,180 @@ less useful results falling back to higher upper bounds, but is very fast. In
 this implementation, it retrieves an upper bound on the size for small memory
 allocations based on calculating the size class region. This function is safe
 to use from signal handlers already.
+
+## Stats
+
+If stats are enabled, hardened\_malloc keeps tracks allocator statistics in
+order to provide implementations of `mallinfo` and `malloc_info`.
+
+On Android, `mallinfo` is used for [mallinfo-based garbage collection
+triggering](https://developer.android.com/preview/features#mallinfo) so
+hardened\_malloc enables `CONFIG_STATS` by default. The `malloc_info`
+implementation on Android is the standard one in Bionic, with the information
+is provided to Bionic via Android's internal extended `mallinfo` API with
+support for arenas and size class bins. This means the `malloc_info` output is
+fully compatible, including still having `jemalloc-1` as the version of the
+data format to retain compatibility with existing tooling.
+
+On non-Android Linux, `mallinfo` has zeroed fields even with `CONFIG_STATS`
+enabled because glibc `mallinfo` is inherently broken. It defines the fields as
+`int` instead of `size_t`, resulting in undefined signed overflows. It also
+misuses the fields and provides a strange, idiosyncratic set of values rather
+than following the SVID/XPG `mallinfo` definition. The `malloc_info` function
+is still provided, with a similar format as what Android uses, with tweaks for
+hardened\_malloc and the the version set to `hardened_malloc-1`. The data
+format may be changed in the future.
+
+As an example, consider the follow program from the hardened\_malloc tests:
+
+```c
+#include <pthread.h>
+
+#include <malloc.h>
+
+__attribute__((optimize(0)))
+void leak_memory(void) {
+    (void)malloc(1024 * 1024 * 1024);
+    (void)malloc(16);
+    (void)malloc(32);
+    (void)malloc(4096);
+}
+
+void *do_work(void *p) {
+    leak_memory();
+    return NULL;
+}
+
+int main(void) {
+    pthread_t thread[4];
+    for (int i = 0; i < 4; i++) {
+        pthread_create(&thread[i], NULL, do_work, NULL);
+    }
+    for (int i = 0; i < 4; i++) {
+        pthread_join(thread[i], NULL);
+    }
+
+    malloc_info(0, stdout);
+}
+```
+
+This produces the following output when piped through `xmllint --format -`:
+
+```xml
+<?xml version="1.0"?>
+<malloc version="hardened_malloc-1">
+  <heap nr="0">
+    <bin nr="2" size="32">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>32</allocated>
+    </bin>
+    <bin nr="3" size="48">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>48</allocated>
+    </bin>
+    <bin nr="13" size="320">
+      <nmalloc>4</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>20480</slab_allocated>
+      <allocated>1280</allocated>
+    </bin>
+    <bin nr="29" size="5120">
+      <nmalloc>2</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>40960</slab_allocated>
+      <allocated>10240</allocated>
+    </bin>
+    <bin nr="45" size="81920">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>81920</slab_allocated>
+      <allocated>81920</allocated>
+    </bin>
+  </heap>
+  <heap nr="1">
+    <bin nr="2" size="32">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>32</allocated>
+    </bin>
+    <bin nr="3" size="48">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>48</allocated>
+    </bin>
+    <bin nr="29" size="5120">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>40960</slab_allocated>
+      <allocated>5120</allocated>
+    </bin>
+  </heap>
+  <heap nr="2">
+    <bin nr="2" size="32">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>32</allocated>
+    </bin>
+    <bin nr="3" size="48">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>48</allocated>
+    </bin>
+    <bin nr="29" size="5120">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>40960</slab_allocated>
+      <allocated>5120</allocated>
+    </bin>
+  </heap>
+  <heap nr="3">
+    <bin nr="2" size="32">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>32</allocated>
+    </bin>
+    <bin nr="3" size="48">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>4096</slab_allocated>
+      <allocated>48</allocated>
+    </bin>
+    <bin nr="29" size="5120">
+      <nmalloc>1</nmalloc>
+      <ndalloc>0</ndalloc>
+      <slab_allocated>40960</slab_allocated>
+      <allocated>5120</allocated>
+    </bin>
+  </heap>
+  <heap nr="4">
+    <allocated_large>4294967296</allocated_large>
+  </heap>
+</malloc>
+```
+
+The heap entries correspond to the arenas. Unlike jemalloc, hardened\_malloc
+doesn't handle large allocations within the arenas, so it presents those in the
+`malloc_info` statistics as a separate arena dedicated to large allocations.
+For example, with 4 arenas enabled, there will be a 5th arena in the statistics
+for the large allocations.
+
+The `nmalloc` / `ndalloc` fields are 64-bit integers tracking allocation and
+deallocation count. These are defined as wrapping on overflow, per the jemalloc
+implementation.
+
+See the [section on size classes](#size-classes) to map the size class bin
+number to the corresponding size class. The bin index begins at 0, mapping to
+the 0 byte size class, followed by 1 for the 16 bytes, 2 for 32 bytes, etc. and
+large allocations are treated as one group.
 
 ## System calls
 
