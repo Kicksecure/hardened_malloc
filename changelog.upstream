@@ -1,3 +1,36 @@
+commit 6175f323d73c51bb18bc5a6a7f5778c30e9f3196
+Merge: 8e69bfe 6d78dec
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Aug 27 04:53:20 2019 -0400
+
+    Merge tag '2'
+    
+    2
+
+commit 8e69bfe6adcf8af5cc8ef39fe3d92cdd0a6651e0
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Aug 23 16:54:48 2019 +0000
+
+    bumped changelog version
+
+commit 6d78dec42a7233f9c8d9cb3e6cf32ef86771960e
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Aug 20 15:57:59 2019 -0400
+
+    clarify malloc_info format is a bit different
+
+commit 2e4ab73fb67c3f9bbed068900d3483badb71fbc7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Aug 19 06:11:10 2019 -0400
+
+    basic design -> core design
+
+commit 0e4ea0090b0b7bccc52b53ee8f8358384ce1a1ac
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Aug 19 06:10:40 2019 -0400
+
+    expand design documentation further
+
 commit 3510356893dfb495dc1609034bd6721d1af54233
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Aug 18 14:26:52 2019 +0000
@@ -18,6 +51,96 @@ Date:   Sun Aug 18 14:20:43 2019 +0000
 
     revert to Makefile by upstream
 
+commit 5b3d59ec7dcc49d40b99a474457d2099df1e430d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 08:41:12 2019 -0400
+
+    Makefile: split long line for SHARED_FLAGS
+
+commit 7c455c39560f753964c12863e1413ef603f846f4
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:56:52 2019 -0400
+
+    update libdivide to 2.0
+
+commit efda9509942889d58a59ef1abeebab64d50631eb
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:52:09 2019 -0400
+
+    fix width of cell in memory tagging section
+
+commit 40be77003e89706c6cef8cc9e6025c1e47481aad
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:48:03 2019 -0400
+
+    fix OS integration header level
+
+commit 0af33616f030f344947f7e518a42253da41030b6
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:47:00 2019 -0400
+
+    cleaner wording in introduction
+
+commit c66cf10894f033502b5a20b26d3df6b8a1a01e49
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:45:53 2019 -0400
+
+    clarify malloc_object_size state further
+
+commit 0129d8e470e74ea60488321c13d95e0e020ad077
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:44:35 2019 -0400
+
+    move point about delayed free for slab allocations
+
+commit 5eefcd39b41f1f39a69b2904072b0387e206fa10
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:24:21 2019 -0400
+
+    the design / implementation is fairly complete now
+
+commit 2288b3a754c4bf9be98d3aa9f7df8fb02bdc5295
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 06:20:08 2019 -0400
+
+    add information on stats
+
+commit f4afedb1374bbf54d74a9c5c21adea3701a03b01
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 05:48:29 2019 -0400
+
+    add links to size class section from configuration
+
+commit ac70e2c250862631e2dcd3708ed5e86ab2ff0252
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 05:47:13 2019 -0400
+
+    use full sentences to describe compile options
+
+commit d0b466beb81a19d118ef47b698154eb0ee71cc23
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 05:42:53 2019 -0400
+
+    elaborate on the cost of GUARD_SLABS_INTERVAL
+
+commit 7a8c57d0f5546827afeba86db59b104489baeacc
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 05:37:30 2019 -0400
+
+    stop marking MPK support 'extremely experimental'
+
+commit c4fc025fde2f1dd6e2f4f20db36c09165458b719
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 05:35:48 2019 -0400
+
+    clarify ZERO_ON_FREE / WRITE_AFTER_FREE_CHECK
+
+commit 58b56f10eae3a16d34ac4123f56fa90c8100cce6
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 04:53:51 2019 -0400
+
+    avoid -shared-libgcc due to old Clang versions
+
 commit 4b859c81c5eeb7ef7cb782e961401789c1f01278
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Aug 18 08:50:33 2019 +0000
@@ -25,6 +148,125 @@ Date:   Sun Aug 18 08:50:33 2019 +0000
     add Build-Depends: clang-tidy
     
     to support "make test" which calls "make tidy"
+
+commit 125efe99db7906874e7ac5bf077c08e1f2fb98f5
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:51:32 2019 -0400
+
+    fix wording in note about malloc_object_size
+
+commit 77b242ea3fc6aa42a85c47c05c698229a1067e9a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:43:49 2019 -0400
+
+    enable misc tidy checks
+
+commit d37657e1258e1dbc3d1e3cbcf4e96312f59cf5a3
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:39:55 2019 -0400
+
+    enable llvm-include-order tidy check
+
+commit 3c67708c3aad2ecfd82509facec8363bfe03fa64
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:34:38 2019 -0400
+
+    reorder clang-tidy checks parameters
+
+commit 2ad74515b1f093407a84e52b6ec59021211c8212
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:31:05 2019 -0400
+
+    enable -Werror for Android build system
+
+commit abece7656bc9c6737417f01df186dba43f70e14c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:28:23 2019 -0400
+
+    add enabled-by-default option to use -Werror
+
+commit c70745ab156fa0212cb5e8ffbb3a3a1a1be40c90
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:19:51 2019 -0400
+
+    Makefile: add check target depending on tidy
+
+commit 7d4d2ef0fb5149d988c80a6daaf957596ddf160f
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:16:04 2019 -0400
+
+    treat clang-tidy warnings as errors for automation
+
+commit 8133444f43da67875463d300ca5e83068dd875a2
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 02:12:18 2019 -0400
+
+    move clang-tidy configuration to .clang-tidy
+
+commit 8f9f2521a01020ac55096f7d386d9d021081d2ce
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:59:48 2019 -0400
+
+    disable sanitizer recovery in UBSan debug builds
+    
+    This makes it harder to miss that an error occurred and avoids spamming
+    output. There should never be a single error, so it doesn't make sense
+    to gather as many errors as possible when a single error is already a
+    serious issue that would need to be fixed.
+
+commit d8ebdea05f5d5627c30af200803cca4008417e0a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:56:20 2019 -0400
+
+    handle CONFIG_SEAL_METADATA option like the others
+
+commit defd55f302ee0211f88ce98211aefaba8776ebaa
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:43:57 2019 -0400
+
+    provide link to Bionic integration commit
+
+commit 04f69d9f0de39955769e6f0d31820ec9a160c826
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:41:56 2019 -0400
+
+    update supported Android branches
+
+commit 995d0580d1f923615623092276fe05ca4cee9308
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:39:22 2019 -0400
+
+    remove extra spaces inserted by vim joinspaces
+
+commit 8d2df1deb8ddf2965dba5859ff9c8cf8dc1ef42d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:27:02 2019 -0400
+
+    use CC as CXX to make sure LTO is compatible
+
+commit 1bc201c4c179a3ddb8d12735d78e15265b99f5e4
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:15:24 2019 -0400
+
+    use -Wcast-align if -Wcast-align=strict is missing
+
+commit cc8c4459e1147857b5e917e1c2744e442935fd57
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:14:45 2019 -0400
+
+    make safe_flag treat unknown warnings as missing
+
+commit b6b910f0323216b86d32c3204a085f6ad22a4887
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 01:10:20 2019 -0400
+
+    add table of contents to README
+
+commit 24de5aab05e4ad678bc703b49871bb02f0fc9cb8
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Aug 18 00:36:38 2019 -0400
+
+    still need to finish up initial malloc_object_size
 
 commit c0ed18686e2657bf95536b01ffdfc957e51a58e4
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -38,6 +280,12 @@ Date:   Sun Aug 18 03:24:48 2019 +0000
     
     https://github.com/GrapheneOS/hardened_malloc/pull/90
 
+commit 71e45773673be84edbf8b45f8330204e153cc364
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Aug 13 21:28:34 2019 -0400
+
+    fix some inconsistencies in the tagging examples
+
 commit a4b3f55a43532bf377bfd67f55160fc02ac54415
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 1 11:41:37 2019 +0000
@@ -49,6 +297,12 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Aug 1 11:13:39 2019 +0000
 
     readme
+
+commit 75e86914aa7945d59b1728e33316319b3b44d8f3
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Jul 29 17:52:55 2019 +0000
+
+    respect existing CFLAGS, CPPFLAGS and LDFLAGS
 
 commit 1d877ad4b3cffbda2f2e45e5087dd0a37ad476f8
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -217,6 +471,40 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Jul 21 00:20:45 2019 +0000
 
     initial debian packaging
+
+commit 90d12fb340c2c5245c063d85a3c0136b11b971ec
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jul 19 11:23:44 2019 -0400
+
+    override local default to -fstack-protector-strong
+    
+    This is a no-op on a toolchain compiled with the basic mitigations
+    enabled by default, so this is generally a no-op anywhere this project
+    is likely to be deployed. SSP has a very low performance cost so there's
+    little reason to avoid it, even though it also has zero value for this
+    code in practice. It would be great if one of the more modern approaches
+    was widely adopted, but unfortunately SSP is as good as it gets for
+    portable options. It doesn't provide any protection against external
+    writes to the stack data which is all that's really needed here.
+    
+    ShadowCallStack is a great option for arm64, but it's substantially more
+    difficult to protect return addresses well on x86_64 due to the design of
+    the ISA and ABI.
+
+commit 77743e5a36cdda57bebd163e4b7fec72a22eb865
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jul 19 11:15:49 2019 -0400
+
+    use -fstack-clash-protection for completeness
+    
+    This is a no-op for the current code and will likely remain that way so
+    there's no benefit but also no performance cost.
+
+commit 3ed6e546c85ee9ac131122f31725830edfa7c01f
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Jul 18 07:21:27 2019 -0400
+
+    OS integration guide
 
 commit d80919fa1e8042a070a3f9b2560ff2ecac8a75da
 Author: Daniel Micay <danielmicay@gmail.com>
