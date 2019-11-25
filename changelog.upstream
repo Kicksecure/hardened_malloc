@@ -1,3 +1,13 @@
+commit 21b5b8aaa5f9168c44888096f41b9459306bd873
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 08:37:45 2019 +0000
+
+    fix, use same version number as upstream (2.0)
+    
+    no changes to the core of hardened-malloc
+    
+    Debian packaging only
+
 commit e1cc3afc4c5188e2d72aa22786620967a34b1104
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Nov 25 08:32:27 2019 +0000
