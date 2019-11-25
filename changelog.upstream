@@ -1,3 +1,35 @@
+commit e1cc3afc4c5188e2d72aa22786620967a34b1104
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 08:32:27 2019 +0000
+
+    remove dependency on genmkfile
+    
+    allow building with `dpkg-buildpackage -b`
+
+commit ad435e9feae664d45ef80653ef94cc0ccb50c980
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 08:29:00 2019 +0000
+
+    reset the upstream default Makefile
+
+commit 4d4adefb56dcde92768ccf8eb64a201f10baa392
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 07:36:50 2019 +0000
+
+    move make-helper-overrides.bsh -> debian/make-helper-overrides.bsh
+
+commit 7a089da4f706d35a493c8a00d6b7f9c848bae43e
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 07:35:37 2019 +0000
+
+    use version numbers by upstream
+
+commit f0f72b4132500625c73526967bea67cdd5b958eb
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Mon Nov 25 02:34:10 2019 -0500
+
+    fix version scheme
+
 commit 01a64a9a899d2c32f03d55cb5a4016f7435f1794
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Aug 27 04:56:09 2019 -0400
