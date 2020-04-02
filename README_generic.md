@@ -45,9 +45,15 @@ sudo apt-get update
 sudo apt-get install hardened_malloc
 ```
 
-## How to Build deb Package ##
+## How to Build deb Package from Source Code ##
 
-Replace `apparmor-profile-torbrowser` with the actual name of this package with `hardened_malloc` and see [instructions](https://www.whonix.org/wiki/Dev/Build_Documentation/apparmor-profile-torbrowser).
+Can be build using standard Debian package build tools such as:
+
+```
+dpkg-buildpackage -b
+```
+
+See [instructions](https://www.whonix.org/wiki/Dev/Build_Documentation/hardened_malloc). (Replace `package-name` with the actual name of this package.)
 
 ## Contact ##
 
