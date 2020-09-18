@@ -14,3 +14,4 @@ if:
 env:
   global:
   - TRAVIS_DEBIAN_DISTRIBUTION=buster
+  - TRAVIS_DEBIAN_GIT_BUILDPACKAGE=./debian/ci_test
