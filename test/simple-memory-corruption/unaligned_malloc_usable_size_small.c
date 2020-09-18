@@ -1,13 +1,12 @@
-#include <stdlib.h>
+#include <malloc.h>
 
 #include "../test_util.h"
 
 OPTNONE int main(void) {
-    char *p = malloc(8);
+    char *p = malloc(16);
     if (!p) {
         return 1;
     }
-    *(p + 8 + 7) = 0;
-    free(p);
+    malloc_usable_size(p + 1);
     return 0;
 }
