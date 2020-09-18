@@ -1,9 +1,17 @@
 dist: focal
-language: c
-compiler: clang
 
-before_install:
-  - sudo apt-get -y install clang llvm-7-dev clang-tidy
+#before_install:
+#  - sudo apt-get -y install clang llvm-7-dev clang-tidy
+
+addons:
+  apt:
+    packages:
+      - clang-7
+      - llvm-7-dev
+      - clang-tidy
+env:
+  global:
+    - CC="/usr/bin/clang-7"
 
 script:
   - make
