@@ -1,7 +1,9 @@
 language: c
 compiler: clang
 
+before_install:
+  - sudo apt-get -y install clang llvm-7-dev clang-tidy
+
 script:
   - make
   - make test
-
