@@ -9,3 +9,7 @@ script:
 
 if:
   tag IS blank
+
+env:
+  global:
+  - TRAVIS_DEBIAN_DISTRIBUTION=buster
