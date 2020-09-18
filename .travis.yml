@@ -1,0 +1,18 @@
+sudo: required
+language: generic
+
+services:
+  - docker
+
+script:
+  #- wget -O- http://travis.debian.net/script.sh | sh -
+  - wget -O- https://raw.githubusercontent.com/adrelanos/travis.debian.net/gh-pages/script.sh | sh -
+
+if:
+  tag IS blank
+
+env:
+  global:
+  - TRAVIS_DEBIAN_DISTRIBUTION=buster
+  - TRAVIS_DEBIAN_GIT_BUILDPACKAGE=./debian/ci_test
+  - TRAVIS_DEBIAN_NO_BUILD=true
