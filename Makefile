@@ -25,10 +25,14 @@ define safe_flag
 $(shell $(CC) $(if $(filter clang,$(CC)),-Werror=unknown-warning-option) -E $1 - </dev/null >/dev/null 2>&1 && echo $1 || echo $2)
 endef
 
-CPPFLAGS := $(CPPFLAGS) -D_GNU_SOURCE
+CPPFLAGS := $(CPPFLAGS) -D_GNU_SOURCE -I include
 SHARED_FLAGS := -O3 -flto -fPIC -fvisibility=hidden $(call safe_flag,-fno-plt) \
     $(call safe_flag,-fstack-clash-protection) -fstack-protector-strong -pipe -Wall -Wextra \
     $(call safe_flag,-Wcast-align=strict,-Wcast-align) -Wcast-qual -Wwrite-strings
+
+ifeq ($(CC),clang)
+    SHARED_FLAGS += -Wno-constant-logical-operand
+endif
 
 ifeq ($(CONFIG_WERROR),true)
     SHARED_FLAGS += -Werror
@@ -39,7 +43,7 @@ ifeq ($(CONFIG_NATIVE),true)
 endif
 
 CFLAGS := $(CFLAGS) -std=c11 $(SHARED_FLAGS) -Wmissing-prototypes
-CXXFLAGS := $(call safe_flag,-std=c++17,-std=c++14) $(SHARED_FLAGS)
+CXXFLAGS := $(CXXFLAGS) $(call safe_flag,-std=c++17,-std=c++14) $(SHARED_FLAGS)
 LDFLAGS := $(LDFLAGS) -Wl,--as-needed,-z,defs,-z,relro,-z,now,-z,nodlopen,-z,text
 
 SOURCES := chacha.c h_malloc.c memory.c pages.c random.c util.c
@@ -115,9 +119,9 @@ libhardened_malloc.so: $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared $^ $(LDLIBS) -o $@
 
 chacha.o: chacha.c chacha.h util.h
-h_malloc.o: h_malloc.c h_malloc.h mutex.h memory.h pages.h random.h util.h
+h_malloc.o: h_malloc.c include/h_malloc.h mutex.h memory.h pages.h random.h util.h
 memory.o: memory.c memory.h util.h
-new.o: new.cc h_malloc.h util.h
+new.o: new.cc include/h_malloc.h util.h
 pages.o: pages.c pages.h memory.h util.h
 random.o: random.c random.h chacha.h util.h
 util.o: util.c util.h
@@ -130,4 +134,8 @@ tidy:
 clean:
 	rm -f libhardened_malloc.so $(OBJECTS)
 
-.PHONY: check clean tidy
+test: libhardened_malloc.so
+	make -C test/
+	-python -m unittest discover --start-directory test/
+
+.PHONY: check clean tidy test

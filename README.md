@@ -3,6 +3,9 @@
 * [Introduction](#introduction)
 * [Dependencies](#dependencies)
 * [Testing](#testing)
+    * [Individual Applications](#individual-applications)
+    * [Automated Test Framework](#automated-test-framework)
+* [Compatibility](#compatibility)
 * [OS integration](#os-integration)
     * [Android-based operating systems](#android-based-operating-systems)
     * [Traditional Linux-based operating systems](#traditional-linux-based-operating-systems)
@@ -62,12 +65,12 @@ used instead as this allocator fundamentally doesn't support that environment.
 
 ## Dependencies
 
-Debian oldstable (currently Debian 9) determines the most ancient set of
+Debian stable (currently Debian 10) determines the most ancient set of
 supported dependencies:
 
-* glibc 2.24
-* Linux 4.9
-* Clang 3.8 or GCC 6.3
+* glibc 2.28
+* Linux 4.19
+* Clang 7.0 or GCC 8.3.0
 
 However, using more recent releases is highly recommended. Older versions of
 the dependencies may be compatible at the moment but are not tested and will
@@ -77,10 +80,20 @@ For external malloc replacement with musl, musl 1.1.20 is required. However,
 there will be custom integration offering better performance in the future
 along with other hardening for the C standard library implementation.
 
-For Android, only current generation Android Open Source Project branches will
-be supported, which currently means pie-qpr3-release and pie-qpr3-b-release.
+For Android, only the current generation, actively developed maintenance
+branch of the Android Open Source Project will be supported, which currently
+means `android11-release`.
+
+The Linux kernel's implementation of Memory Protection Keys was severely broken
+before Linux 5.0. The `CONFIG_SEAL_METADATA` feature should only be enabled for
+use on kernels newer than 5.0 or longterm branches with a backport of the [fix
+for the
+issue](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a31e184e4f69965c99c04cc5eb8a4920e0c63737).
+This issue was discovered and reported by the hardened\_malloc project.
 
 ## Testing
+
+### Individual Applications
 
 The `preload.sh` script can be used for testing with dynamically linked
 executables using glibc or musl:
@@ -100,6 +113,17 @@ region can be implemented to offer similar isolation for dynamic libraries as
 this allocator offers across different size classes. The intention is that this
 will be offered as part of hardened variants of the Bionic and musl C standard
 libraries.
+
+### Automated Test Framework
+
+A collection of simple, automated tests are provided and can be run with the
+make command as follows:
+
+    make test
+
+## Compatibility
+
+OpenSSH 8.1 or higher is required to allow the mprotect PROT_READ|PROT_WRITE system calls in the seccomp-bpf filter rather than killing the process.
 
 ## OS integration
 
@@ -129,11 +153,11 @@ value in the build configuration.
 
 On traditional Linux-based operating systems, hardened\_malloc can either be
 integrated into the libc implementation as a replacement for the standard
-malloc implementation or loaded as a dynamic library. Rather rebuilding each
-executable to be linked against it, it can be added as a preloaded library to
-`/etc/ld.so.preload`. For example, with `libhardened_malloc.so` installed to
-`/usr/local/lib/libhardened_malloc.so`, add that full path as a line to the
-`/etc/ld.so.preload` configuration file:
+malloc implementation or loaded as a dynamic library. Rather than rebuilding
+each executable to be linked against it, it can be added as a preloaded
+library to `/etc/ld.so.preload`. For example, with `libhardened_malloc.so`
+installed to `/usr/local/lib/libhardened_malloc.so`, add that full path as a
+line to the `/etc/ld.so.preload` configuration file:
 
     /usr/local/lib/libhardened_malloc.so
 
@@ -166,6 +190,32 @@ Configuration options are provided when there are significant compromises
 between portability, performance, memory usage or security. The core design
 choices are not configurable and the allocator remains very security-focused
 even with all the optional features disabled.
+
+For reduced memory usage at the expense of performance (this will also reduce
+the size of the empty slab caches and quarantines, saving a lot of memory,
+since those are currently based on the size of the largest size class):
+
+    make \
+    N_ARENA=1 \
+    CONFIG_EXTENDED_SIZE_CLASSES=false
+
+The default configuration has all normal security features enabled (just not
+the niche `CONFIG_SEAL_METADATA`) and is quite aggressive in terms of
+sacrificing performance and memory usage for security. An example of a leaner
+configuration disabling expensive security features other than zero-on-free /
+slab canaries along with using far fewer guard slabs:
+
+    make \
+    CONFIG_WRITE_AFTER_FREE_CHECK=false \
+    CONFIG_SLOT_RANDOMIZE=false \
+    CONFIG_SLAB_QUARANTINE_RANDOM_LENGTH=0 \
+    CONFIG_SLAB_QUARANTINE_QUEUE_LENGTH=0 \
+    CONFIG_GUARD_SLABS_INTERVAL=8
+
+This is a more appropriate configuration for a more mainstream OS choosing to
+use hardened\_malloc while making a smaller memory and performance sacrifice.
+The slot randomization isn't particularly expensive but it's low value and is
+one of the first things to disable when aiming for higher performance.
 
 The following boolean configuration options are available:
 
@@ -257,7 +307,7 @@ The following integer configuration options are available:
   number of slots in the random array used to randomize free slab reuse.
 * `CONFIG_CLASS_REGION_SIZE`: `34359738368` (default) to control the size of
   the size class regions.
-* `CONFIG_N_ARENA`: `1` (default) to control the number of arenas
+* `CONFIG_N_ARENA`: `4` (default) to control the number of arenas
 * `CONFIG_STATS`: `false` (default) to control whether stats on allocation /
   deallocation count and active allocations are tracked. See the [section on
   stats](#stats) for more details.
@@ -772,10 +822,10 @@ On Android, `mallinfo` is used for [mallinfo-based garbage collection
 triggering](https://developer.android.com/preview/features#mallinfo) so
 hardened\_malloc enables `CONFIG_STATS` by default. The `malloc_info`
 implementation on Android is the standard one in Bionic, with the information
-is provided to Bionic via Android's internal extended `mallinfo` API with
-support for arenas and size class bins. This means the `malloc_info` output is
-fully compatible, including still having `jemalloc-1` as the version of the
-data format to retain compatibility with existing tooling.
+provided to Bionic via Android's internal extended `mallinfo` API with support
+for arenas and size class bins. This means the `malloc_info` output is fully
+compatible, including still having `jemalloc-1` as the version of the data
+format to retain compatibility with existing tooling.
 
 On non-Android Linux, `mallinfo` has zeroed fields even with `CONFIG_STATS`
 enabled because glibc `mallinfo` is inherently broken. It defines the fields as
@@ -783,8 +833,8 @@ enabled because glibc `mallinfo` is inherently broken. It defines the fields as
 misuses the fields and provides a strange, idiosyncratic set of values rather
 than following the SVID/XPG `mallinfo` definition. The `malloc_info` function
 is still provided, with a similar format as what Android uses, with tweaks for
-hardened\_malloc and the the version set to `hardened_malloc-1`. The data
-format may be changed in the future.
+hardened\_malloc and the version set to `hardened_malloc-1`. The data format
+may be changed in the future.
 
 As an example, consider the follow program from the hardened\_malloc tests:
 
@@ -967,7 +1017,6 @@ Additional system calls when `CONFIG_SEAL_METADATA=true` is set:
 * `pkey_alloc`
 * `pkey_mprotect` instead of `mprotect` with an additional `pkey` parameter,
   but otherwise the same (regular `mprotect` is never called)
-* `uname` (to detect old buggy kernel versions)
 
 Additional system calls for Android builds with `LABEL_MEMORY`:
 
