@@ -26,3 +26,9 @@ override_dh_installchangelogs:
 
 override_dh_auto_build:
 	dh_auto_build -- CONFIG_NATIVE=false CC=$(CC)
+
+#dh_auto_test:
+## Tests failing inside (cowbuilder) chroot.
+## https://github.com/GrapheneOS/hardened_malloc/issues/119
+## Not doing anything about it because test fails open, does not break the
+## build.
