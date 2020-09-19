@@ -12,6 +12,10 @@
 #DPKG_EXPORT_BUILDFLAGS = 1
 #include /usr/share/dpkg/buildflags.mk
 
+## Intentionally dropping: -fstack-protector-strong -Wformat -Werror=format-security
+## Unintentionally dropping: -fdebug-prefix-map=
+CFLAGS =
+
 CC  := clang
 
 %:
