@@ -5,9 +5,12 @@
 
 #export DH_VERBOSE=1
 
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-DPKG_EXPORT_BUILDFLAGS = 1
-include /usr/share/dpkg/buildflags.mk
+## Cannot set. Causes tests to fail. Also not required since upstream already
+## sets hardening options in upstream Makefile.
+## https://github.com/GrapheneOS/hardened_malloc/issues/120#issuecomment-694933692
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+#DPKG_EXPORT_BUILDFLAGS = 1
+#include /usr/share/dpkg/buildflags.mk
 
 CC  := clang
 
