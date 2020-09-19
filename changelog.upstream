@@ -1,8 +1,404 @@
+commit 168907c1c83247ab1fb27b953726ac2e223bc365
+Merge: 0188e9b e58aa20
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 19 09:20:32 2020 -0400
+
+    Merge branch '3test'
+
+commit e58aa20467a8e6251c873f76d46407e70bacc6c9
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 19 09:09:21 2020 -0400
+
+    disable tests
+    
+    Tests failing inside (cowbuilder) chroot.
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/119
+    
+    Test failing on travis CI.
+    
+    https://api.travis-ci.com/v3/job/387405272/log.txt
+
+commit 650b7e3f256152550d723a0c318cda30f687876a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 19 08:57:59 2020 -0400
+
+    comment: Tests failing inside (cowbuilder) chroot.
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/119
+
+commit 02f826d41c66776609c7d062451ea1750ae52e29
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 19 08:54:44 2020 -0400
+
+    Intentionally dropping: -fstack-protector-strong -Wformat -Werror=format-security
+    Unintentionally dropping: -fdebug-prefix-map=
+    
+    by setting `CFLAGS =`
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/120#issuecomment-694933692
+
+commit 1d14b7f49fa3b71d6fc6975286580e32da611171
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 19 08:26:15 2020 -0400
+
+    disable `export DEB_BUILD_MAINT_OPTIONS = hardening=+all`
+    
+    Cannot set. Causes tests to fail. Also not required since upstream already
+    sets hardening options in upstream Makefile.
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/120#issuecomment-694933692
+
+commit 5257b19bd45cc6ee8fcb76bb2ab32fb41aa634cb
+Merge: cdaaa0c cc77a84
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 09:47:11 2020 -0400
+
+    Merge branch 'travis-test' into 3test
+
+commit cc77a84352aff25466bb1d0b0a38d64471fa139f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 09:44:17 2020 -0400
+
+    travis
+
+commit 0d1da4a342603addbc427f71e8da6bf49fecf2af
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 09:14:05 2020 -0400
+
+    travis
+
+commit 0070ac3a437a3160ae36fa98ebbf1bbf517b490d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 09:11:07 2020 -0400
+
+    travis
+
+commit 4f0520fd83b8093450f4d0b7562492965e69924b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 09:00:22 2020 -0400
+
+    travis
+
+commit 286070a9baff3108ff341cf6c06b2931eafff31c
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 08:47:52 2020 -0400
+
+    travis
+
+commit 0eba7c1439d390595f3f48df84d5b1442c4dd5ec
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 08:43:40 2020 -0400
+
+    Add /.travis.yml to extend-diff-ignore in debian/source/options.
+
+commit 951e8c8e3c6d69be1f7aa9c412934518ab17f14f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 08:38:53 2020 -0400
+
+    Add .travis.yml from <http://travis.debian.net>
+
+commit cdaaa0c4f495a1ff39b1c7097e64631fa2ffb890
+Merge: 0188e9b b4bbd09
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Sep 18 06:14:40 2020 -0400
+
+    Merge tag '3' into 3test
+    
+    3
+
+commit b4bbd09f07772e648ca05684a3b462e3074f09fe
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:54:50 2020 -0400
+
+    change label for quarantined large allocations
+
+commit a88305c01b409703e50c98a1ffa4f58c3ff6d161
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:51:16 2020 -0400
+
+    support disabling region quarantine
+
+commit 85c5c3736c396702ac5ce3aed7f18c0498c7334f
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:29:13 2020 -0400
+
+    add stats tracking to special large realloc paths
+
+commit 96a9bcf3a1246bb1e1fabc7a990d374e6959eae3
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:20:05 2020 -0400
+
+    move deprecated glibc extensions to the bottom
+
+commit 41fb89517ab13a4530b13f7e0f635ef4021364a1
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:09:45 2020 -0400
+
+    simplify malloc_info code
+
+commit 50e0f1334c3e08bf253316557a8fc2a3651cf753
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:07:10 2020 -0400
+
+    add is_init check to malloc_info
+
+commit 9fb2791af21b36f2ecea67ecb5d27d3a85c7b9d9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 16:00:03 2020 -0400
+
+    add is_init check to h_mallinfo_arena_info
+
+commit 8974af86d12f7e29b54b5090133ab3d7eea0e519
+Author: anupritaisno1 <www.anuprita804@gmail.com>
+Date:   Tue Sep 15 01:33:53 2020 +0000
+
+    hardened malloc: iterate -> malloc_iterate
+    
+    Signed-off-by: anupritaisno1 <www.anuprita804@gmail.com>
+
+commit d203d6c4456e1f88edef7136a99be1ad7ef7cfdd
+Author: anupritaisno1 <www.anuprita804@gmail.com>
+Date:   Mon Sep 14 09:10:27 2020 +0000
+
+    Android.bp: export hardened malloc headers
+    
+    Signed-off-by: anupritaisno1 <www.anuprita804@gmail.com>
+
+commit 9f5e1f6eb9cff75ca975842eac549f31204d1019
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Sep 14 05:57:39 2020 -0400
+
+    master is only going to support Android 11
+
+commit 1cba2544525f048e25f0a540d726dbfaa4359489
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Sep 14 05:52:53 2020 -0400
+
+    move external API to include directory
+
+commit 730f148647302c9ae542df4c2f606cf0a00b33e8
+Author: anupritaisno1 <www.anuprita804@gmail.com>
+Date:   Sun Sep 13 08:56:39 2020 +0000
+
+    Android.bp: make hardened malloc ramdisk available
+    
+    Signed-off-by: anupritaisno1 <www.anuprita804@gmail.com>
+
+commit dd7291ebfeedfa475e2f27079a2ed454245fd810
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Aug 5 18:10:53 2020 -0400
+
+    better wording for page size mismatch error
+
+commit bcb93cab639176078b881911b7f7686c759f6052
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Aug 4 17:22:03 2020 -0400
+
+    avoid an ifdef
+
+commit f214bd541a8f03cc8cf5faeed07692bff11d9f9a
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Wed Jun 17 19:00:32 2020 -0700
+
+    added check for if small allocations are free
+
+commit 7804e263e9e2eac91f71b211e7c1e451b5fb279a
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Wed Jun 17 18:59:44 2020 -0700
+
+    added tests for if malloc_object_size small allocations are free
+
+commit de3fb50dcc2c40ca108f8946e84538833db462c9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jun 17 16:39:50 2020 -0400
+
+    tests: make no-optimize attribute Clang compatible
+
+commit b404d6da6e3c1882b52dc76db7915265c34e079e
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jun 17 16:27:59 2020 -0400
+
+    fix out-of-memory check in offset test
+
+commit c9c7dca4984fd1da03c9298b6594118613ee95d2
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jun 17 16:26:01 2020 -0400
+
+    use size_t in offset test to fix warning
+
+commit dcc80a01dbcfde0105832cb0c94f74a4d26fe461
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Jun 16 11:10:13 2020 -0400
+
+    android10-qpr3-release
+
+commit 722974f4e93aedda99bf1a8e106f19a7acf14d58
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Jun 13 09:59:50 2020 -0400
+
+    remove trailing whitespace
+
+commit 195bc8c92a0ab2c9c5f39e40cd0cfe4738e9f855
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Jun 8 19:21:17 2020 -0700
+
+    added tests for malloc_object_size
+    
+    LDFLAGS is on single line
+
+commit 577524798e1df4fba4be1d053198d784ed057afd
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Jun 8 19:17:53 2020 -0700
+
+    calculates offset from start for small allocations
+
+commit 467ba8440fd0b382f6ef7b0034d6db2767b91909
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun May 24 09:36:43 2020 -0400
+
+    add comment explaining slab cache size
+
+commit 067b3c864f8caf24d5ec51f0014e58f285b2eba0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun May 24 09:31:02 2020 -0400
+
+    set slab cache sizes based on the largest slab
+
+commit 82440e78d9cbda71f8e0ca49b14381e56618eb55
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon May 18 19:10:14 2020 -0400
+
+    silence annoying tidy checks
+
+commit fc0bd7821592ce2b9fbe83893dec3861353254e4
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 13 03:48:44 2020 -0400
+
+    default number of arenas is currently 4
+
+commit 08a5f5ee0b59cd60b943615a5f0ec7de72d46931
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 13 03:19:17 2020 -0400
+
+    reduces empty slab cache size now too
+
+commit e82367e1bf1a07223d314cce863821ad7a2daa75
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 13 03:06:49 2020 -0400
+
+    include leaner sample configurations
+
+commit 4a6bbe445c2a9b06cc564cc09dcafc9239564fd2
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 13 01:05:37 2020 -0400
+
+    limit cached slabs based on max size class
+
+commit cf55ac0f6d324ed2b30dbc1418ca7b68f1645557
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Apr 30 16:36:47 2020 -0400
+
+    disable annoying Clang warning from avoiding ifdef
+
+commit b672316bc76ce942187fc03ef5ef2f7a288b583f
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Apr 30 16:06:32 2020 -0400
+
+    use const for memory_corruption_check_small
+    
+    This currently causes a warning (treated as an error) on Android where
+    malloc_usable_size uses a const pointer.
+
+commit 029a2edf28a390524533f351bd5c61d123934342
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Apr 30 11:47:24 2020 -0400
+
+    remove trailing whitespace
+
+commit 35bd7cd76dd59d6f1d27f94ce72097b972811822
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Wed Apr 15 21:09:50 2020 -0700
+
+    added memory corruption checking to malloc_usable_size for slab allocations
+
+commit 0a3a726c93878bc0c0bf9fac80fcd6719fda6153
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Wed Apr 15 21:02:16 2020 -0700
+
+    added tests for malloc_usable_size
+
+commit 19365c25d62329e397699c21bf1acaf170e22235
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Apr 24 02:51:10 2020 -0400
+
+    remove workaround for Linux kernel MPK fork bug
+
+commit 0188e9b16427d57e09d22b497f4febe92c134c1b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Apr 16 08:33:08 2020 -0400
+
+    bumped changelog version
+
 commit 0f7e7382f91c91da45f2cc69009c0b41d57d2683
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 15 14:05:32 2020 -0400
 
     readme
+
+commit c75dcb9d9cfd8732dc593cb16cf3a6df79e0526c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Apr 11 15:26:24 2020 -0400
+
+    compare with negative integers to check signals
+
+commit d757835d9077d8bf1b7194ec22bb5e5e1d2661d5
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Apr 11 15:17:37 2020 -0400
+
+    increase size for eight_byte_overflow_large test
+    
+    This was not working as expected due to CONFIG_EXTENDED_SIZE_CLASSES
+    resulting in 128k being a slab allocation size class. The addition of
+    padding for the canary pushes it into the next size class, resulting in
+    this writing over size class rounding padding rather than this actually
+    being an overflow as intended.
+
+commit 2c421590b5964f6c3d88c31be6b63b14bbe8cd01
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Mar 30 17:12:02 2020 -0700
+
+    added testing headers to table of contents
+
+commit 9f661f945c50f209d8c7b4751feda0476f2196b2
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Mar 30 16:49:12 2020 -0700
+
+    added testing instructions
+
+commit b160f723e011e4b93a7a3bde50097fcef8b12014
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Mar 30 16:38:27 2020 -0700
+
+    ignores __pycache__
+
+commit ec6854c71b0f0241cb96782fe6e800885dd98eba
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Mar 30 16:36:11 2020 -0700
+
+    added test rule
+
+commit 6b987e644b19889daf22d849c2498b8c25876991
+Author: rwarr627 <r.n.warren@protonmail.com>
+Date:   Mon Mar 30 16:30:43 2020 -0700
+
+    verifies the results of the simple-memory-corruption tests
+
+commit 2a87f52fc1a229c079cad54baf1f7ec70b6612e9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Apr 7 21:28:02 2020 -0400
+
+    use organization funding metadata
 
 commit b9f9e3485e23671259928eb93c1703f406012c1a
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -33,6 +429,48 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Apr 1 08:49:56 2020 -0400
 
     update copyright year
+
+commit 466d351e9361705e7c8a44d9395f5eca3873369b
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Mar 29 07:41:18 2020 -0400
+
+    drop legacy glibc version check for pkey support
+
+commit 043622709278cab8ad486eb7177ec36615b3f3cf
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Mar 29 07:39:23 2020 -0400
+
+    no longer need glibc pthread_atfork workaround
+
+commit 3af44d2e6a07b0be06fc2f7674d81055d1d1606d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Mar 29 07:31:45 2020 -0400
+
+    can now depend on libc having a getrandom wrapper
+
+commit a5abe5add6788f529e435af615fd092610cd7f52
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Mar 29 07:30:46 2020 -0400
+
+    increase minimum dependency versions
+
+commit 26134f9aaa690e109a60fb27f2e10c8c5de7fe8b
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 7 18:13:11 2020 -0500
+
+    update copyright notice
+
+commit 449962e04403702f14a3c4829aa36d3f1f0a79a7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Feb 3 08:38:53 2020 -0500
+
+    disable obsolete glibc extensions elsewhere
+
+commit bee398f860860dd669f05f682d4ba0377cba3467
+Author: Valentin Churavy <v.churavy@gmail.com>
+Date:   Sat Dec 28 14:18:52 2019 -0500
+
+    replace __BEGIN_DECLS with extern "C"
 
 commit a361a56f4d726d182c34d9e17db1c4d54650e281
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -81,6 +519,90 @@ Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Mon Nov 25 02:34:10 2019 -0500
 
     fix version scheme
+
+commit 7c5c768e2f376d2169da93e3760635a80f2e24a3
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 06:04:16 2019 -0500
+
+    update libdivide copyright
+
+commit 7945b3f109773261f89382c32c4ab2e11d833121
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 05:41:58 2019 -0500
+
+    update libdivide to 3.0
+
+commit dfa49481e561f535c24295192ccd649538beb85f
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 05:28:12 2019 -0500
+
+    random: fix whitespace issue
+
+commit 2fbf7bb25ec9a0b5648f91ed214029ef2a87eb85
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 05:12:50 2019 -0500
+
+    fix another README typo
+
+commit ac95820fae2cf9e060fd5e24e944b8fdb6f6dd08
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 04:57:41 2019 -0500
+
+    remove duplicate word from README
+
+commit b48ac93b035e843ebe1fe4ec9d53954c721dcc28
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 03:33:04 2019 -0500
+
+    current supported branch is android10-release
+
+commit eff5037d64d1f54c5f441744598da101f851f2db
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Nov 6 03:30:46 2019 -0500
+
+    add missing word to README
+
+commit 97ea85f55d4dfa1e1a731b2754f631fd06a99a6d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Oct 11 09:06:13 2019 -0400
+
+    README: add Compatibility to TOC
+
+commit 6f4de3971e16b40f0d682df41343926e9ab3c81e
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Oct 9 23:27:25 2019 -0400
+
+    document OpenSSH compatibility fix
+
+commit cb73bccf3533b4eba759e9669173b6ef8035f6ac
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 26 18:42:25 2019 -0400
+
+    add GitHub sponsors metadata
+
+commit 74eb614f1627f2e0c3b8ac946f1c0617517282ce
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 26 14:50:58 2019 -0400
+
+    inherit base CXXFLAGS from the environment too
+
+commit a28da3c65aed0528036da9ebd33e0c05b2c5884a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Sep 7 18:30:04 2019 -0400
+
+    use prefix for extended mallinfo functions
+
+commit fb9f5d630b131a3e3b490c7babd9fd2f5834006d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Sep 7 17:59:08 2019 -0400
+
+    use cc_library instead of cc_library_static
+
+commit 8d648e2b257979023e825616d5df29d7f7e7c849
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Sep 7 17:38:43 2019 -0400
+
+    make it available in recovery for Android 10
 
 commit 01a64a9a899d2c32f03d55cb5a4016f7435f1794
 Author: Patrick Schleizer <adrelanos@riseup.net>
