@@ -1,3 +1,23 @@
+commit 7e5dd71596418ce91c5f9b53f0aa8abf138f3367
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 11:30:31 2020 -0400
+
+    CONFIG_NATIVE=false
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/89
+
+commit 19ff229bcb0ee959c5e9b115e47e60e0a734d597
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 11:30:15 2020 -0400
+
+    refactoring
+
+commit 1cdddf46b00f3583a9a807d278c6c371afc7324d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 10:13:43 2020 -0400
+
+    bumped changelog version
+
 commit d0a74274afe4dad047eb5892f278ec742e8b7a0b
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Oct 7 10:13:43 2020 -0400
