@@ -1,3 +1,51 @@
+commit d0a74274afe4dad047eb5892f278ec742e8b7a0b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 10:13:43 2020 -0400
+
+    readme
+
+commit cee13a3981b68085300fdcc01043e65025dc715a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 10:12:56 2020 -0400
+
+    fix installation path
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/84
+
+commit d684cfacaa09190d8f3ee01c844a45c448f48828
+Merge: 4a86834 d74b504
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 10:00:03 2020 -0400
+
+    Merge remote-tracking branch 'github/master'
+
+commit d74b50482b04fa1d6b5128e627d81dd7f67d00b1
+Merge: 4a86834 5564188
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 13:59:07 2020 +0000
+
+    Merge pull request #1 from madaidan/kicksecure
+    
+    Create libhardened_malloc_kicksecure.so
+
+commit 556418894fef1eb542b668dd9b88fe6b5e2b9f4f
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Wed Oct 7 13:28:36 2020 +0000
+
+    Install libhardened_malloc_kicksecure.so
+
+commit 73b1659fdcb40b6e4e7b607a4c2745d1ced68080
+Author: madaidan <50278627+madaidan@users.noreply.github.com>
+Date:   Wed Oct 7 13:28:13 2020 +0000
+
+    Create libhardened_malloc.so_kicksecure
+
+commit 4a86834f5d3cce55593cef772de8d4d20120b6b7
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sat Sep 19 09:45:08 2020 -0400
+
+    bumped changelog version
+
 commit 1af409e12029c6328cb5e095adc1f78a756f17b9
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Sep 19 09:26:19 2020 -0400
