@@ -1,5 +1,7 @@
+#!/usr/bin/dh-exec
+
 ## Copyright (C) 2019 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
 ## See the file COPYING for copying conditions.
 
-libhardened_malloc.so_original usr/lib/libhardened_malloc.so/libhardened_malloc.so
-libhardened_malloc.so_kicksecure usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so
+libhardened_malloc.so_original => /usr/lib/libhardened_malloc.so/libhardened_malloc.so
+libhardened_malloc.so_kicksecure => /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so
