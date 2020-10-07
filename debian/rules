@@ -17,8 +17,8 @@ override_dh_auto_build:
 	dh_auto_build -- libhardened_malloc.so CONFIG_NATIVE=false CC=$(CC)
 	mv libhardened_malloc.so libhardened_malloc.so_original
 	make clean
-	dh_auto_build -- libhardened_malloc.so CONFIG_SLAB_QUARANTINE_RANDOM_LENGTH=0 CONFIG_SLAB_QUARANTINE_QUEUE_LENGTH=0 CONFIG_GUARD_SLABS_INTERVAL=8 CC=$(CC)
-	mv libhardened_malloc.so libhardened_malloc.so_kicksecure	
+	dh_auto_build -- libhardened_malloc.so CC=$(CC) CONFIG_SLAB_QUARANTINE_RANDOM_LENGTH=0 CONFIG_SLAB_QUARANTINE_QUEUE_LENGTH=0 CONFIG_GUARD_SLABS_INTERVAL=8
+	mv libhardened_malloc.so libhardened_malloc.so_kicksecure
 
 ## Tests failing inside (cowbuilder) chroot.
 ## https://github.com/GrapheneOS/hardened_malloc/issues/119
