@@ -13,7 +13,7 @@ divided up per size class.
 It can be added as a preloaded library using /etc/ld.so.preload.
 ## How to install `hardened_malloc` using apt-get ##
 
-1\. Download [Whonix's Signing Key]().
+1\. Download Whonix's Signing Key.
 
 ```
 wget https://www.whonix.org/patrick.asc
