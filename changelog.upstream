@@ -1,3 +1,23 @@
+commit 67e600b87fbb9829986203031d428b142ed2d759
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 05:40:08 2020 -0400
+
+    readme
+
+commit 82ea528b1cbfe29c192d8f8474e1dcd3cec7a404
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 04:57:57 2020 -0400
+
+    implement hardened-malloc-kicksecure-enable package
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/82
+
+commit 310e270063fd0edcb699ece2f84db4aaaf74e06d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Wed Oct 7 11:41:49 2020 -0400
+
+    bumped changelog version
+
 commit 7e5dd71596418ce91c5f9b53f0aa8abf138f3367
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Wed Oct 7 11:30:31 2020 -0400
