@@ -11,6 +11,18 @@ entirely independently arenas, with the internal locking within arenas further
 divided up per size class.
 
 It can be added as a preloaded library using /etc/ld.so.preload.
+
+Ships two files:
+
+* [1] /usr/lib/libhardened_malloc.so/libhardened_malloc.so
+* [2] /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so
+
+[1] Is was compiled with Hardened Malloc compilation parameters.
+
+[2] Uses a modified configuration that aims to be suitable to be enabled by
+default in Whonix and Kicksecure. It is a lightweight fork of Hardened
+Malloc by Kicksecure developers with no other changes than compilation
+parameters.
 ## How to install `hardened_malloc` using apt-get ##
 
 1\. Download Whonix's Signing Key.
