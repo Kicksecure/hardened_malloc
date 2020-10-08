@@ -1,3 +1,21 @@
+commit cd9577830903ff89826cf30aca79010f0b2ec4bf
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 13:39:17 2020 -0400
+
+    ship `/etc/sysctl.d/hardened_malloc.conf` with `vm.max_map_count = 524240`
+    
+    https://github.com/GrapheneOS/hardened_malloc#traditional-linux-based-operating-systems
+    
+    Thanks to @madaidan for the suggestion!
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/93
+
+commit 4c790044e07e14e23a0fe3c9583023c076fbd5dc
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 05:40:09 2020 -0400
+
+    bumped changelog version
+
 commit 67e600b87fbb9829986203031d428b142ed2d759
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Oct 8 05:40:08 2020 -0400
