@@ -1,0 +1,52 @@
+#!/bin/bash
+
+## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+if [ -f /usr/lib/helper-scripts/pre.bsh ]; then
+   source /usr/lib/helper-scripts/pre.bsh
+fi
+
+set -e
+
+true "
+#####################################################################
+## INFO: BEGIN: $DPKG_MAINTSCRIPT_PACKAGE $DPKG_MAINTSCRIPT_NAME $@
+#####################################################################
+"
+
+## feature request: /etc/ld.so.preload.d drop-in configuration folder support
+## https://sourceware.org/bugzilla/show_bug.cgi?id=24913
+
+if [ "$1" = "purge" ] || [ "$1" = "remove" ]; then
+   if test -r /etc/ld.so.preload ; then
+      if grep -q /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so /etc/ld.so.preload ; then
+         if str_replace /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so "" /etc/ld.so.preload >/dev/null ; then
+            echo "INFO: $0: Removed /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so from /etc/ld.so.preload, OK."
+         else
+            echo "ERROR: $0: Removal of /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so from /etc/ld.so.preload failed." >&2
+         fi
+      else
+         echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so was already removed from /etc/ld.so.preload, OK."
+      fi
+   else
+      echo "INFO: $0: /etc/ld.so.preload does not exist, therefore no need to remove /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so, OK."
+   fi
+
+   rm -f /var/lib/hardened-malloc-kicksecure-enable/enabled
+fi
+
+true "INFO: debhelper beginning here."
+
+#DEBHELPER#
+
+true "INFO: Done with debhelper."
+
+true "
+#####################################################################
+## INFO: END  : $DPKG_MAINTSCRIPT_PACKAGE $DPKG_MAINTSCRIPT_NAME $@
+#####################################################################
+"
+
+## Explicitly "exit 0", so eventually trapped errors can be ignored.
+exit 0
