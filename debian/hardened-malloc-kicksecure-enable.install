@@ -1,0 +1,6 @@
+#!/usr/bin/dh-exec
+
+## Copyright (C) 2020 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## See the file COPYING for copying conditions.
+
+debian/hardened_malloc.conf => /etc/sysctl.d/hardened_malloc.conf
