@@ -1,3 +1,40 @@
+commit ef327be1fa3deb465ec367dc454922fa7dd11da4
+Merge: b7ccfb2 10c5d61
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Nov 13 08:54:53 2020 -0500
+
+    Merge tag '4'
+    
+    4
+
+commit 10c5d61187badae1666200c32584fa76050bb031
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Nov 10 14:14:08 2020 -0500
+
+    work around glibc bug in mallinfo test
+
+commit b90f650153c677fc3a95f80f747987a828d3bdf3
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Nov 10 13:53:32 2020 -0500
+
+    fix sized deallocation check with large sizes
+    
+    The CONFIG_CXX_ALLOCATOR feature enables sanity checks for sized
+    deallocation and this wasn't updated to handle the introduction of
+    performing size class rounding for large sizes.
+
+commit 8d0314295ebf2a84604aeb7eef3b759daef92f1a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Oct 19 07:25:15 2020 -0400
+
+    support Android's logging system for fatal_error
+
+commit b7ccfb2da09eb1fd5a9af216112afcdc03c312e6
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Thu Oct 8 13:39:32 2020 -0400
+
+    bumped changelog version
+
 commit cd9577830903ff89826cf30aca79010f0b2ec4bf
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Thu Oct 8 13:39:17 2020 -0400
@@ -98,11 +135,41 @@ Date:   Wed Oct 7 13:28:13 2020 +0000
 
     Create libhardened_malloc.so_kicksecure
 
+commit b072022022b7d6c3f29001560603479ae6ba883c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Oct 6 17:34:35 2020 -0400
+
+    perform init sanity checks before MPK unsealing
+
+commit 2bb1c39d31aff68a58fb5be2e0bc7c6168d37acd
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Oct 6 17:32:25 2020 -0400
+
+    add MPK support for stats retrieval functions
+
+commit 0bf18b7c266e7c1ee05f64916ac5c3aada2b0936
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Oct 3 15:10:07 2020 -0400
+
+    optimize malloc_usable_size enforce_init
+
+commit 178d4f320f0a0798d066fec12c196963a7ee608c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Oct 2 15:04:41 2020 -0400
+
+    harden checks for uninitialized usage
+
 commit 4a86834f5d3cce55593cef772de8d4d20120b6b7
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sat Sep 19 09:45:08 2020 -0400
 
     bumped changelog version
+
+commit b9ebf47c7cfd6ca0ba29c25181789dd383a73f1b
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Sep 19 09:40:41 2020 -0400
+
+    explicitly use python3 to run tests
 
 commit 1af409e12029c6328cb5e095adc1f78a756f17b9
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -161,6 +228,12 @@ Date:   Sat Sep 19 08:26:15 2020 -0400
     
     https://github.com/GrapheneOS/hardened_malloc/issues/120#issuecomment-694933692
 
+commit 8906c0941a8c0a3c7bcb1ae3348c7baa93565871
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Sep 18 11:38:06 2020 -0400
+
+    improve mallinfo test
+
 commit 5257b19bd45cc6ee8fcb76bb2ab32fb41aa634cb
 Merge: cdaaa0c cc77a84
 Author: Patrick Schleizer <adrelanos@riseup.net>
@@ -218,6 +291,30 @@ Date:   Fri Sep 18 06:14:40 2020 -0400
     Merge tag '3' into 3test
     
     3
+
+commit 59e174eee083af31363cd9da88ef3aac2d708ff8
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 17:44:01 2020 -0400
+
+    update stats documentation
+
+commit 483b1d7b8b8832b85c657d16863d2c7d19bc5d07
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 17:40:19 2020 -0400
+
+    empty malloc_info output when stats are disabled
+
+commit 96eca21ac5fc49bb348e97f8f0347fa458dbb212
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 17:37:49 2020 -0400
+
+    remove thread_local macro workaround glibc < 2.28
+
+commit 022b64791ea8096c5c91bbad67c0debcf72604f9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 17 17:23:13 2020 -0400
+
+    whitespace fixes
 
 commit b4bbd09f07772e648ca05684a3b462e3074f09fe
 Author: Daniel Micay <danielmicay@gmail.com>
