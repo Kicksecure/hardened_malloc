@@ -4,21 +4,36 @@
 
 #include "test_util.h"
 
-OPTNONE int main(void) {
-    malloc(1024 * 1024 * 1024);
-    malloc(16);
-    malloc(32);
-    malloc(64);
-
+static void print_mallinfo(void) {
     struct mallinfo info = mallinfo();
-    printf("arena: %zu\n", info.arena);
-    printf("ordblks: %zu\n", info.ordblks);
-    printf("smblks: %zu\n", info.smblks);
-    printf("hblks: %zu\n", info.hblks);
-    printf("hblkhd: %zu\n", info.hblkhd);
-    printf("usmblks: %zu\n", info.usmblks);
-    printf("fsmblks: %zu\n", info.fsmblks);
-    printf("uordblks: %zu\n", info.uordblks);
-    printf("fordblks: %zu\n", info.fordblks);
-    printf("keepcost: %zu\n", info.keepcost);
+    printf("mallinfo:\n");
+    printf("arena: %zu\n", (size_t)info.arena);
+    printf("ordblks: %zu\n", (size_t)info.ordblks);
+    printf("smblks: %zu\n", (size_t)info.smblks);
+    printf("hblks: %zu\n", (size_t)info.hblks);
+    printf("hblkhd: %zu\n", (size_t)info.hblkhd);
+    printf("usmblks: %zu\n", (size_t)info.usmblks);
+    printf("fsmblks: %zu\n", (size_t)info.fsmblks);
+    printf("uordblks: %zu\n", (size_t)info.uordblks);
+    printf("fordblks: %zu\n", (size_t)info.fordblks);
+    printf("keepcost: %zu\n", (size_t)info.keepcost);
+}
+
+OPTNONE int main(void) {
+    void *a[4];
+
+    a[0] = malloc(1024 * 1024 * 1024);
+    a[1] = malloc(16);
+    a[2] = malloc(32);
+    a[3] = malloc(64);
+
+    print_mallinfo();
+
+    free(a[0]);
+    free(a[1]);
+    free(a[2]);
+    free(a[3]);
+
+    printf("\n");
+    print_mallinfo();
 }

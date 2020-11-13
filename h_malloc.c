@@ -6,13 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if __has_include(<threads.h>)
 #include <threads.h>
-#else
-// glibc < 2.28
-#define thread_local _Thread_local
-#endif
 
 #include <malloc.h>
 #include <pthread.h>
@@ -74,8 +68,8 @@ static const unsigned thread_arena = 0;
 
 static union {
     struct {
-        void *_Atomic slab_region_start;
-        void *slab_region_end;
+        void *slab_region_start;
+        void *_Atomic slab_region_end;
         struct size_class *size_class_metadata[N_ARENA];
         struct region_allocator *region_allocator;
         struct region_metadata *regions[2];
@@ -86,8 +80,8 @@ static union {
     char padding[PAGE_SIZE];
 } ro __attribute__((aligned(PAGE_SIZE)));
 
-static inline void *get_slab_region_start() {
-    return atomic_load_explicit(&ro.slab_region_start, memory_order_acquire);
+static inline void *get_slab_region_end() {
+    return atomic_load_explicit(&ro.slab_region_end, memory_order_acquire);
 }
 
 #define SLAB_METADATA_COUNT
@@ -1045,7 +1039,7 @@ static void post_fork_child(void) {
 }
 
 static inline bool is_init(void) {
-    return get_slab_region_start() != NULL;
+    return get_slab_region_end() != NULL;
 }
 
 static inline void enforce_init(void) {
@@ -1104,12 +1098,12 @@ COLD static void init_slow_path(void) {
         fatal_error("failed to unprotect memory for regions table");
     }
 
-    void *slab_region_start = memory_map(slab_region_size);
-    if (slab_region_start == NULL) {
+    ro.slab_region_start = memory_map(slab_region_size);
+    if (ro.slab_region_start == NULL) {
         fatal_error("failed to allocate slab region");
     }
-    ro.slab_region_end = (char *)slab_region_start + slab_region_size;
-    memory_set_name(slab_region_start, slab_region_size, "malloc slab region gap");
+    void *slab_region_end = (char *)ro.slab_region_start + slab_region_size;
+    memory_set_name(ro.slab_region_start, slab_region_size, "malloc slab region gap");
 
     for (unsigned arena = 0; arena < N_ARENA; arena++) {
         ro.size_class_metadata[arena] = allocator_state->size_class_metadata[arena];
@@ -1121,7 +1115,7 @@ COLD static void init_slow_path(void) {
 
             size_t bound = (REAL_CLASS_REGION_SIZE - CLASS_REGION_SIZE) / PAGE_SIZE - 1;
             size_t gap = (get_random_u64_uniform(rng, bound) + 1) * PAGE_SIZE;
-            c->class_region_start = (char *)slab_region_start + ARENA_SIZE * arena + REAL_CLASS_REGION_SIZE * class + gap;
+            c->class_region_start = (char *)ro.slab_region_start + ARENA_SIZE * arena + REAL_CLASS_REGION_SIZE * class + gap;
             label_slab(c->class_region_start, CLASS_REGION_SIZE, class);
 
             size_t size = size_classes[class];
@@ -1137,7 +1131,7 @@ COLD static void init_slow_path(void) {
 
     deallocate_pages(rng, sizeof(struct random_state), PAGE_SIZE);
 
-    atomic_store_explicit(&ro.slab_region_start, slab_region_start, memory_order_release);
+    atomic_store_explicit(&ro.slab_region_end, slab_region_end, memory_order_release);
 
     if (memory_protect_ro(&ro, sizeof(ro))) {
         fatal_error("failed to protect allocator data");
@@ -1241,7 +1235,7 @@ static void deallocate_large(void *p, const size_t *expected_size) {
         fatal_error("invalid free");
     }
     size_t size = region->size;
-    if (expected_size && size != *expected_size) {
+    if (expected_size && size != get_large_size_class(*expected_size)) {
         fatal_error("sized deallocation mismatch (large)");
     }
     size_t guard_size = region->guard_size;
@@ -1361,7 +1355,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
     }
 
     size_t old_size;
-    if (old >= get_slab_region_start() && old < ro.slab_region_end) {
+    if (old < get_slab_region_end() && old >= ro.slab_region_start) {
         old_size = slab_usable_size(old);
         if (size <= MAX_SLAB_SIZE_CLASS && get_size_info(size).size == old_size) {
             return old;
@@ -1537,7 +1531,7 @@ EXPORT void h_free(void *p) {
         return;
     }
 
-    if (p >= get_slab_region_start() && p < ro.slab_region_end) {
+    if (p < get_slab_region_end() && p >= ro.slab_region_start) {
         thread_unseal_metadata();
         deallocate_small(p, NULL);
         thread_seal_metadata();
@@ -1558,7 +1552,7 @@ EXPORT void h_free_sized(void *p, size_t expected_size) {
         return;
     }
 
-    if (p >= get_slab_region_start() && p < ro.slab_region_end) {
+    if (p < get_slab_region_end() && p >= ro.slab_region_start) {
         thread_unseal_metadata();
         expected_size = get_size_info(adjust_size_for_canaries(expected_size)).size;
         deallocate_small(p, &expected_size);
@@ -1618,16 +1612,18 @@ EXPORT size_t h_malloc_usable_size(H_MALLOC_USABLE_SIZE_CONST void *p) {
         return 0;
     }
 
-    enforce_init();
-    thread_unseal_metadata();
+    if (p < get_slab_region_end() && p >= ro.slab_region_start) {
+        thread_unseal_metadata();
 
-    if (p >= get_slab_region_start() && p < ro.slab_region_end) {
         memory_corruption_check_small(p);
         thread_seal_metadata();
 
         size_t size = slab_usable_size(p);
         return size ? size - canary_size : 0;
     }
+
+    enforce_init();
+    thread_unseal_metadata();
 
     struct region_allocator *ra = ro.region_allocator;
     mutex_lock(&ra->lock);
@@ -1647,10 +1643,10 @@ EXPORT size_t h_malloc_object_size(void *p) {
         return 0;
     }
 
-    thread_unseal_metadata();
+    void *slab_region_end = get_slab_region_end();
+    if (p < slab_region_end && p >= ro.slab_region_start) {
+        thread_unseal_metadata();
 
-    void *slab_region_start = get_slab_region_start();
-    if (p >= slab_region_start && p < ro.slab_region_end) {
         struct slab_size_class_info size_class_info = slab_size_class(p);
         size_t class = size_class_info.class;
         size_t size_class = size_classes[class];
@@ -1683,9 +1679,11 @@ EXPORT size_t h_malloc_object_size(void *p) {
         return size ? size - canary_size - offset : 0;
     }
 
-    if (unlikely(slab_region_start == NULL)) {
+    if (unlikely(slab_region_end == NULL)) {
         return SIZE_MAX;
     }
+
+    thread_unseal_metadata();
 
     struct region_allocator *ra = ro.region_allocator;
     mutex_lock(&ra->lock);
@@ -1702,13 +1700,13 @@ EXPORT size_t h_malloc_object_size_fast(void *p) {
         return 0;
     }
 
-    void *slab_region_start = get_slab_region_start();
-    if (p >= slab_region_start && p < ro.slab_region_end) {
+    void *slab_region_end = get_slab_region_end();
+    if (p < slab_region_end && p >= ro.slab_region_start) {
         size_t size = slab_usable_size(p);
         return size ? size - canary_size : 0;
     }
 
-    if (unlikely(slab_region_start == NULL)) {
+    if (unlikely(slab_region_end == NULL)) {
         return 0;
     }
 
@@ -1780,6 +1778,8 @@ EXPORT struct mallinfo h_mallinfo(void) {
         return info;
     }
 
+    thread_unseal_metadata();
+
     struct region_allocator *ra = ro.region_allocator;
     mutex_lock(&ra->lock);
     info.hblkhd += ra->allocated;
@@ -1799,6 +1799,8 @@ EXPORT struct mallinfo h_mallinfo(void) {
 
     info.fordblks = info.hblkhd - info.uordblks;
     info.usmblks = info.hblkhd;
+
+    thread_seal_metadata();
 #endif
 
     return info;
@@ -1812,10 +1814,12 @@ EXPORT int h_malloc_info(int options, UNUSED FILE *fp) {
         return -1;
     }
 
-#if CONFIG_STATS
     fputs("<malloc version=\"hardened_malloc-1\">", fp);
 
+#if CONFIG_STATS
     if (is_init()) {
+        thread_unseal_metadata();
+
         for (unsigned arena = 0; arena < N_ARENA; arena++) {
             fprintf(fp, "<heap nr=\"%u\">", arena);
 
@@ -1850,15 +1854,14 @@ EXPORT int h_malloc_info(int options, UNUSED FILE *fp) {
         fprintf(fp, "<heap nr=\"%u\">", N_ARENA);
         fprintf(fp, "<allocated_large>%zu</allocated_large>", region_allocated);
         fputs("</heap>", fp);
+
+        thread_seal_metadata();
     }
+#endif
 
     fputs("</malloc>", fp);
 
     return 0;
-#else
-    errno = ENOSYS;
-    return -1;
-#endif
 }
 #endif
 
@@ -1887,6 +1890,8 @@ EXPORT struct mallinfo h_mallinfo_arena_info(UNUSED size_t arena) {
         return info;
     }
 
+    thread_unseal_metadata();
+
     if (arena < N_ARENA) {
         for (unsigned class = 0; class < N_SIZE_CLASSES; class++) {
             struct size_class *c = &ro.size_class_metadata[arena][class];
@@ -1904,6 +1909,8 @@ EXPORT struct mallinfo h_mallinfo_arena_info(UNUSED size_t arena) {
         info.uordblks = ra->allocated;
         mutex_unlock(&ra->lock);
     }
+
+    thread_seal_metadata();
 #endif
 
     return info;
@@ -1924,6 +1931,8 @@ EXPORT struct mallinfo h_mallinfo_bin_info(UNUSED size_t arena, UNUSED size_t bi
     }
 
     if (arena < N_ARENA && bin < N_SIZE_CLASSES) {
+        thread_seal_metadata();
+
         struct size_class *c = &ro.size_class_metadata[arena][bin];
 
         mutex_lock(&c->lock);
@@ -1931,6 +1940,8 @@ EXPORT struct mallinfo h_mallinfo_bin_info(UNUSED size_t arena, UNUSED size_t bi
         info.uordblks = c->nmalloc;
         info.fordblks = c->ndalloc;
         mutex_unlock(&c->lock);
+
+        thread_unseal_metadata();
     }
 #endif
 
