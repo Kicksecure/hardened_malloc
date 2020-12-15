@@ -1,3 +1,33 @@
+commit ec912a38ea97be04dbc3c628eacf0e6acfa56c2a
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Dec 15 04:44:32 2020 -0500
+
+    conditional
+
+commit 852af90aa81ebc29df69fcbbc29fed387ad2ccc2
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Dec 15 04:43:34 2020 -0500
+
+    comment
+
+commit 98b00ee79094a3b4213797e3d49ba26de36b4b5b
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Dec 15 04:38:18 2020 -0500
+
+    hardened-malloc-kicksecure: add `export MAN_DISABLE_SECCOMP=1`
+    
+    /etc/X11/Xsession.d/50hardened-malloc
+    
+    Thanks to @madaidan for the problem solution!
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/125
+
+commit 9437c07df1f690617e1a0b0f7e498c4a8398b6de
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Nov 13 08:55:08 2020 -0500
+
+    bumped changelog version
+
 commit ef327be1fa3deb465ec367dc454922fa7dd11da4
 Merge: b7ccfb2 10c5d61
 Author: Patrick Schleizer <adrelanos@riseup.net>
