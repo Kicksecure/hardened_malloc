@@ -4,3 +4,4 @@
 ## See the file COPYING for copying conditions.
 
 debian/hardened_malloc.conf => /etc/sysctl.d/hardened_malloc.conf
+debian/50hardened-malloc => /etc/X11/Xsession.d/50hardened-malloc
