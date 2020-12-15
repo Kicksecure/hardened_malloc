@@ -11,4 +11,6 @@
 ## Fixed in `man` upstream. Fix will probably arrive and can be removed in
 ## Debian bullseye and above.
 
-export MAN_DISABLE_SECCOMP=1
+if [ "$MAN_DISABLE_SECCOMP" = "" ]; then
+   export MAN_DISABLE_SECCOMP=1
+fi
