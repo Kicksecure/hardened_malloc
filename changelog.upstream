@@ -1,3 +1,17 @@
+commit 8c619ce5f6ff168b7775b1449517f2a69def753d
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Dec 20 07:51:54 2020 -0500
+
+    `MAN_DISABLE_SECCOMP=1` man seccomp workaround
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/132
+
+commit a19b5b42e88000e7b82d5f46ca206828a6abfb9f
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Tue Dec 15 06:52:40 2020 -0500
+
+    bumped changelog version
+
 commit ec912a38ea97be04dbc3c628eacf0e6acfa56c2a
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Tue Dec 15 04:44:32 2020 -0500
