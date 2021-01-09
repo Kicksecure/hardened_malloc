@@ -1,3 +1,37 @@
+commit 088581a4dda232778029d5dcdb68dd644cf2de4f
+Merge: d3e1af0 5c8b686
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Fri Jan 8 23:32:45 2021 -0500
+
+    Merge tag '5'
+    
+    5
+
+commit 5c8b6863708ebbee4bc68e0dc34e727d2f2dbfc1
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 6 20:38:40 2021 -0500
+
+    update copyright notice
+
+commit 52755632528d819147985bfe15a11849287f1634
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 6 00:12:17 2021 -0500
+
+    fix C++ sized deallocation check false positive
+    
+    This is a compatibility issue triggered when both slab canaries and the
+    C++ allocator overloads providing sized deallocation checks are enabled.
+    
+    The boundary where slab allocations are turned into large allocations
+    due to not having room for the canary in the largest slab allocation
+    size class triggers a false positive in the sized deallocation check.
+
+commit d3e1af06e7b02c678e3023f5ac36c02e2b631b80
+Author: Patrick Schleizer <adrelanos@riseup.net>
+Date:   Sun Dec 20 07:56:30 2020 -0500
+
+    bumped changelog version
+
 commit 8c619ce5f6ff168b7775b1449517f2a69def753d
 Author: Patrick Schleizer <adrelanos@riseup.net>
 Date:   Sun Dec 20 07:51:54 2020 -0500
@@ -35,6 +69,12 @@ Date:   Tue Dec 15 04:38:18 2020 -0500
     Thanks to @madaidan for the problem solution!
     
     https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/125
+
+commit e9d9f70ad48e428a8da10351cc8006ddcf2bfab0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Dec 7 18:14:25 2020 -0500
+
+    update supported Android 11 branch
 
 commit 9437c07df1f690617e1a0b0f7e498c4a8398b6de
 Author: Patrick Schleizer <adrelanos@riseup.net>

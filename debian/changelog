@@ -1,3 +1,9 @@
+hardened-malloc (0:3.0.8-1) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 09 Jan 2021 04:51:35 +0000
+
 hardened-malloc (0:3.0.7-1) unstable; urgency=medium
 
   * New upstream version (local package).
