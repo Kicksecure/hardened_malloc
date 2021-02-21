@@ -1178,6 +1178,7 @@ static size_t get_large_size_class(size_t size) {
         // 512 KiB [2560 KiB, 3 MiB, 3584 KiB, 4 MiB]
         // 1 MiB [5 MiB, 6 MiB, 7 MiB, 8 MiB]
         // etc.
+        size = max(size, PAGE_SIZE);
         size_t spacing_shift = 64 - __builtin_clzl(size - 1) - 3;
         size_t spacing_class = 1ULL << spacing_shift;
         return (size + (spacing_class - 1)) & ~(spacing_class - 1);
@@ -1630,7 +1631,7 @@ EXPORT size_t h_malloc_usable_size(H_MALLOC_USABLE_SIZE_CONST void *p) {
     struct region_allocator *ra = ro.region_allocator;
     mutex_lock(&ra->lock);
     struct region_metadata *region = regions_find(p);
-    if (p == NULL) {
+    if (region == NULL) {
         fatal_error("invalid malloc_usable_size");
     }
     size_t size = region->size;
@@ -1690,7 +1691,7 @@ EXPORT size_t h_malloc_object_size(void *p) {
     struct region_allocator *ra = ro.region_allocator;
     mutex_lock(&ra->lock);
     struct region_metadata *region = regions_find(p);
-    size_t size = p == NULL ? SIZE_MAX : region->size;
+    size_t size = region == NULL ? SIZE_MAX : region->size;
     mutex_unlock(&ra->lock);
 
     thread_seal_metadata();
