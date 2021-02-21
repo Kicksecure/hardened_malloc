@@ -1,3 +1,51 @@
+commit 2c1f6654df947b209c577ae368e38ff0f51294bc
+Merge: 7220570 29b0964
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Feb 21 11:30:24 2021 -0500
+
+    Merge tag '6'
+    
+    6
+
+commit 29b09648d6ad0a01ffaf8ff84b30084ff8bc921a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Feb 16 08:18:44 2021 -0500
+
+    avoid undefined clz and shift in edge cases
+    
+    This is triggered when get_large_size_class is called with a size in the
+    range [1,4]. This can occur with aligned_alloc(8192, size). In practice,
+    it doesn't appear to cause any harm, but we shouldn't have any undefined
+    behavior for well-defined usage of the API. It also occurs if the caller
+    passes a pointer outside the slab region to free_sized but the expected
+    size is in the range [1,4]. That usage of free_sized is already going to
+    be considered undefined, but we should avoid undefined behavior in the
+    caller from triggering more undefined behavior when it's avoidable.
+
+commit 1984cb3b3d749f2d99aae05602d5534dd33f8e88
+Author: Thibaut Sautereau <thibaut.sautereau@ssi.gouv.fr>
+Date:   Wed Feb 10 09:55:09 2021 +0100
+
+    malloc_object_size: avoid fault for invalid region
+    
+    It's the region pointer that can be NULL here, and p was checked at the
+    beginning of the function.
+
+commit 76860c72e1003f12e08dae067b4d7c97c070c208
+Author: Thibaut Sautereau <thibaut.sautereau@ssi.gouv.fr>
+Date:   Wed Feb 10 09:25:55 2021 +0100
+
+    malloc_usable_size: clean abort on invalid region
+    
+    It's the region pointer that can be NULL here, and p was checked at the
+    beginning of the function. Also fix the test accordingly.
+
+commit 722057082964dc452d89aefbe5344692e8b6eb8f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Feb 6 06:29:17 2021 -0500
+
+    bumped changelog version
+
 commit 268bee706a1d035d6c29e4beabc21514cd7b9129
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Feb 6 06:27:53 2021 -0500
