@@ -2,148 +2,148 @@ hardened-malloc (0:3.0.10-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sun, 21 Feb 2021 16:31:03 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sun, 21 Feb 2021 16:31:03 +0000
 
 hardened-malloc (0:3.0.9-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 06 Feb 2021 11:29:17 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sat, 06 Feb 2021 11:29:17 +0000
 
 hardened-malloc (0:3.0.8-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 09 Jan 2021 04:51:35 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sat, 09 Jan 2021 04:51:35 +0000
 
 hardened-malloc (0:3.0.7-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sun, 20 Dec 2020 12:56:30 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sun, 20 Dec 2020 12:56:30 +0000
 
 hardened-malloc (0:3.0.6-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Tue, 15 Dec 2020 11:52:40 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Tue, 15 Dec 2020 11:52:40 +0000
 
 hardened-malloc (0:3.0.5-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Fri, 13 Nov 2020 13:55:08 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Fri, 13 Nov 2020 13:55:08 +0000
 
 hardened-malloc (0:3.0.4-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 08 Oct 2020 17:39:32 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Thu, 08 Oct 2020 17:39:32 +0000
 
 hardened-malloc (0:3.0.3-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 08 Oct 2020 09:40:09 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Thu, 08 Oct 2020 09:40:09 +0000
 
 hardened-malloc (0:3.0.2-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Wed, 07 Oct 2020 15:41:49 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Wed, 07 Oct 2020 15:41:49 +0000
 
 hardened-malloc (0:3.0.1-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Wed, 07 Oct 2020 14:13:43 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Wed, 07 Oct 2020 14:13:43 +0000
 
 hardened-malloc (0:3.0.0-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 19 Sep 2020 13:44:47 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sat, 19 Sep 2020 13:44:47 +0000
 
 hardened-malloc (0:2.0.5-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 19 Sep 2020 13:26:19 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sat, 19 Sep 2020 13:26:19 +0000
 
 hardened-malloc (0:2.0.4-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 16 Apr 2020 12:33:08 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Thu, 16 Apr 2020 12:33:08 +0000
 
 hardened-malloc (0:2.0.3-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 02 Apr 2020 11:47:06 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Thu, 02 Apr 2020 11:47:06 +0000
 
 hardened-malloc (0:2.0.2-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Wed, 01 Apr 2020 14:40:53 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Wed, 01 Apr 2020 14:40:53 +0000
 
 hardened-malloc (0:2.0.1-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Mon, 25 Nov 2019 08:44:22 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Mon, 25 Nov 2019 08:44:22 +0000
 
 hardened-malloc (0:2.0.0-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Mon, 25 Nov 2019 08:35:39 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Mon, 25 Nov 2019 08:35:39 +0000
 
 hardened-malloc (0:0.7.0-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Mon, 25 Nov 2019 07:33:40 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Mon, 25 Nov 2019 07:33:40 +0000
 
 hardened-malloc (0:0.6-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Tue, 27 Aug 2019 08:56:09 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Tue, 27 Aug 2019 08:56:09 +0000
 
 hardened-malloc (0:0.5-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Fri, 23 Aug 2019 16:54:48 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Fri, 23 Aug 2019 16:54:48 +0000
 
 hardened-malloc (0:0.4-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Thu, 01 Aug 2019 11:41:37 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Thu, 01 Aug 2019 11:41:37 +0000
 
 hardened-malloc (0:0.3-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Mon, 29 Jul 2019 13:09:15 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Mon, 29 Jul 2019 13:09:15 +0000
 
 hardened-malloc (0:0.2-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sun, 28 Jul 2019 19:30:10 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sun, 28 Jul 2019 19:30:10 +0000
 
 hardened-malloc (0:0.1-1) unstable; urgency=medium
 
   * New upstream version (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sun, 21 Jul 2019 00:19:12 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sun, 21 Jul 2019 00:19:12 +0000
 
 hardened-malloc (0:0.0-1) unstable; urgency=medium
 
   * Initial release (local package).
 
- -- Patrick Schleizer <adrelanos@riseup.net>  Sat, 20 Jul 2019 23:55:32 +0000
+ -- Patrick Schleizer <adrelanos@whonix.org>  Sat, 20 Jul 2019 23:55:32 +0000

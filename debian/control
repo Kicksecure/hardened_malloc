@@ -1,10 +1,10 @@
-## Copyright (C) 2019 - 2020 ENCRYPTED SUPPORT LP <adrelanos@riseup.net>
+## Copyright (C) 2019 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
 Source: hardened-malloc
 Section: libs
 Priority: optional
-Maintainer: Patrick Schleizer <adrelanos@riseup.net>
+Maintainer: Patrick Schleizer <adrelanos@whonix.org>
 Build-Depends: debhelper (>= 12), dh-exec, clang, llvm-7-dev, clang-tidy
 Homepage: https://github.com/GrapheneOS/hardened_malloc
 Vcs-Browser: https://github.com/GrapheneOS/hardened_malloc
