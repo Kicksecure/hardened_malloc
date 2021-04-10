@@ -10,8 +10,6 @@
 
 #include <malloc.h>
 #include <pthread.h>
-#include <sys/mman.h>
-#include <sys/utsname.h>
 #include <unistd.h>
 
 #include "third_party/libdivide.h"
@@ -102,14 +100,19 @@ struct slab_metadata {
 static const size_t min_align = 16;
 #define MIN_SLAB_SIZE_CLASS_SHIFT 4
 
-// set slab cache size based on the size of the largest slab
 #if !CONFIG_EXTENDED_SIZE_CLASSES
-static const size_t MAX_SLAB_SIZE_CLASS = 65536;
+static const size_t MAX_SLAB_SIZE_CLASS = 16384;
 #define MAX_SLAB_SIZE_CLASS_SHIFT 14
+// limit on the number of cached empty slabs before attempting purging instead
+static const size_t max_empty_slabs_total = MAX_SLAB_SIZE_CLASS * 4;
 #else
 static const size_t MAX_SLAB_SIZE_CLASS = 131072;
 #define MAX_SLAB_SIZE_CLASS_SHIFT 17
+// limit on the number of cached empty slabs before attempting purging instead
+static const size_t max_empty_slabs_total = MAX_SLAB_SIZE_CLASS;
 #endif
+
+static const size_t min_extended_size_class = 20480;
 
 static const u32 size_classes[] = {
     /* 0 */ 0,
@@ -204,9 +207,6 @@ static inline struct size_info get_size_info_align(size_t size, size_t alignment
 static size_t get_slab_size(size_t slots, size_t size) {
     return PAGE_CEILING(slots * size);
 }
-
-// limit on the number of cached empty slabs before attempting purging instead
-static const size_t max_empty_slabs_total = MAX_SLAB_SIZE_CLASS;
 
 struct __attribute__((aligned(CACHELINE_SIZE))) size_class {
     struct mutex lock;
@@ -1178,7 +1178,7 @@ static size_t get_large_size_class(size_t size) {
         // 512 KiB [2560 KiB, 3 MiB, 3584 KiB, 4 MiB]
         // 1 MiB [5 MiB, 6 MiB, 7 MiB, 8 MiB]
         // etc.
-        size = max(size, PAGE_SIZE);
+        size = max(size, (size_t)PAGE_SIZE);
         size_t spacing_shift = 64 - __builtin_clzl(size - 1) - 3;
         size_t spacing_class = 1ULL << spacing_shift;
         return (size + (spacing_class - 1)) & ~(spacing_class - 1);
@@ -1739,9 +1739,11 @@ EXPORT int h_malloc_trim(UNUSED size_t pad) {
         // skip zero byte size class since there's nothing to change
         for (unsigned class = 1; class < N_SIZE_CLASSES; class++) {
             struct size_class *c = &ro.size_class_metadata[arena][class];
-            size_t slab_size = get_slab_size(size_class_slots[class], size_classes[class]);
+            size_t size = size_classes[class];
+            size_t slab_size = get_slab_size(size_class_slots[class], size);
 
             mutex_lock(&c->lock);
+
             struct slab_metadata *iterator = c->empty_slabs;
             while (iterator) {
                 void *slab = get_slab(c, slab_size, iterator);
@@ -1760,6 +1762,33 @@ EXPORT int h_malloc_trim(UNUSED size_t pad) {
                 is_trimmed = true;
             }
             c->empty_slabs = iterator;
+
+#if SLAB_QUARANTINE && CONFIG_EXTENDED_SIZE_CLASSES
+            if (size >= min_extended_size_class) {
+                size_t quarantine_shift = __builtin_clzl(size) - (63 - MAX_SLAB_SIZE_CLASS_SHIFT);
+
+#if SLAB_QUARANTINE_RANDOM_LENGTH > 0
+                size_t slab_quarantine_random_length = SLAB_QUARANTINE_RANDOM_LENGTH << quarantine_shift;
+                for (size_t i = 0; i < slab_quarantine_random_length; i++) {
+                    void *p = c->quarantine_random[i];
+                    if (p != NULL) {
+                        memory_purge(p, size);
+                    }
+                }
+#endif
+
+#if SLAB_QUARANTINE_QUEUE_LENGTH > 0
+                size_t slab_quarantine_queue_length = SLAB_QUARANTINE_QUEUE_LENGTH << quarantine_shift;
+                for (size_t i = 0; i < slab_quarantine_queue_length; i++) {
+                    void *p = c->quarantine_queue[i];
+                    if (p != NULL) {
+                        memory_purge(p, size);
+                    }
+                }
+#endif
+            }
+#endif
+
             mutex_unlock(&c->lock);
         }
     }

@@ -82,7 +82,7 @@ along with other hardening for the C standard library implementation.
 
 For Android, only the current generation, actively developed maintenance
 branch of the Android Open Source Project will be supported, which currently
-means `android11-qpr1-release`.
+means `android11-qpr2-release`.
 
 The Linux kernel's implementation of Memory Protection Keys was severely broken
 before Linux 5.0. The `CONFIG_SEAL_METADATA` feature should only be enabled for
@@ -295,7 +295,7 @@ The following integer configuration options are available:
 * `CONFIG_GUARD_SIZE_DIVISOR`: `2` (default) to control the maximum size of the
   guard regions placed on both sides of large memory allocations, relative to
   the usable size of the memory allocation.
-* `CONFIG_REGION_QUARANTINE_RANDOM_LENGTH`: `128` (default) to control the
+* `CONFIG_REGION_QUARANTINE_RANDOM_LENGTH`: `256` (default) to control the
   number of slots in the random array used to randomize region reuse for large
   memory allocations.
 * `CONFIG_REGION_QUARANTINE_QUEUE_LENGTH`: `1024` (default) to control the
@@ -1008,6 +1008,7 @@ System calls used by all build configurations:
 * `mremap(old, old_size, new_size, MREMAP_MAYMOVE|MREMAP_FIXED, new)`
 * `munmap`
 * `write(STDERR_FILENO, buf, len)` (before aborting due to memory corruption)
+* `madvise(ptr, size, MADV_DONTNEED)` for `malloc_trim` with slab quarantines
 
 The main distinction from a typical malloc implementation is the use of
 getrandom. A common compatibility issue is that existing system call whitelists
