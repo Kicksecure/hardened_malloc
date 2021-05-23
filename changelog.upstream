@@ -1,3 +1,138 @@
+commit d780417209eb3bfe907cb1b1ddb567415882fa3e
+Merge: 7bee4a9 27fcfcc
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 23 14:28:28 2021 -0400
+
+    Merge tag '8'
+    
+    8
+
+commit 27fcfccb6722ca5f31be1a30b6fc5d4d8f863e25
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 22:53:20 2021 -0400
+
+    make __GLIBC_PREREQ check for mallinfo2 portable
+
+commit 93a87ce30b3d11587adb2d20107c812815512098
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 21:13:06 2021 -0400
+
+    add new mallinfo2 test to gitignore too
+
+commit da190f1469277710321e37f1bc89abea001aa584
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 21:01:13 2021 -0400
+
+    mark pvalloc error path as unlikely
+
+commit b0f81365a8c3426ee63658bae5aaee8ca73bbc4c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 20:59:04 2021 -0400
+
+    reuse code for aligned allocation API entry points
+
+commit c9820b6e372e2124c96ba4f545bb667df534b376
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 20:41:46 2021 -0400
+
+    mark alloc_aligned_simple error path unlikely
+
+commit f1cdc1e484b594182d6a60b9331abdb8dc541429
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 20:34:18 2021 -0400
+
+    remove disconcerting newline
+
+commit 26b74b87bf38b0a377c622d166caeee61d49de27
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 20:28:37 2021 -0400
+
+    improve code reuse for malloc API entry points
+
+commit 89faba423293235089e05031d0e475edfe5e65e8
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 20:19:12 2021 -0400
+
+    set errno in malloc_get_state to match glibc
+
+commit a45dacc57be53d6eae523f826bc2e3bb5657a6be
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 20:07:15 2021 -0400
+
+    add support for glibc mallinfo2
+
+commit a71ab1a2eb3106b80673c046939eec746e97897d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 10:51:52 2021 -0400
+
+    MREMAP_DONTUNMAP may be usable in realloc
+
+commit 96a322bcbe773cfa12881d71d18786ec1f70c619
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 10:32:59 2021 -0400
+
+    raise max_map_count recommendation
+
+commit 92a1e456d2ea4c8d80d6e67f4239786e757ce729
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 05:11:30 2021 -0400
+
+    use normal class region size on x86_64 Android
+
+commit 9706f5a311451f35d183ef55e29893b229b38099
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 03:06:57 2021 -0400
+
+    increase class region size on Android to 2GiB
+
+commit 440489af6737085ad0a630a35262653f1f990239
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 01:05:39 2021 -0400
+
+    purge memory if munmap fails
+
+commit f9a8e7216bdcba5f1f25b9f5e1a3aac665b73329
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 00:39:36 2021 -0400
+
+    purge slab memory even if using MAP_FIXED fails
+
+commit 5c974bdf8209e79dedeab1a4d22286f0bbece8ff
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed May 12 00:20:03 2021 -0400
+
+    use region quarantine even if MAP_FIXED call fails
+    
+    This is a more sensible way of handling an out-of-memory failure in this
+    edge case. It doesn't matter much in practice.
+
+commit 2335f56713dbfe0f021fd75319c0ce8ca9a5532b
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon May 10 07:04:50 2021 -0400
+
+    add wrapper function for getting slot count
+
+commit 13a3aa16d0cb70e67d58449e8742327e3ace0927
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri May 7 04:23:49 2021 -0400
+
+    improve naming of adjust_size_for_canaries
+
+commit 8bfa1a7dd50ec8ffb80ae64309cedf27f86ad583
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat May 1 22:10:20 2021 -0400
+
+    use 1 slot for all extended size classes
+    
+    This reduces memory usage and improves security in combination with the
+    guard slab feature.
+
+commit 7bee4a9c3df727ee35ea3f510aae9f6f58934834
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Apr 10 17:23:03 2021 -0400
+
+    bumped changelog version
+
 commit e5190f01653a6977a971637a1941cb469c055ba0
 Author: Daniel Micay <danielmicay@gmail.com>
 Date:   Wed Mar 31 12:12:49 2021 -0400
@@ -12,6 +147,12 @@ Date:   Sat Apr 10 17:00:16 2021 -0400
     Merge tag '7'
     
     7
+
+commit 39526453181babac2ba2ef3d09a406f2b7ff0305
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Mar 31 12:12:49 2021 -0400
+
+    avoid unused variable for some configurations
 
 commit 1d15d34c7ee9d85cff61da2ef6be78fa108230d9
 Author: Daniel Micay <danielmicay@gmail.com>
