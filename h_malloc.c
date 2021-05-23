@@ -144,11 +144,15 @@ static const u16 size_class_slots[] = {
     /* 1024 */ 8, 8, 8, 8,
     /* 2048 */ 6, 5, 4, 4,
 #if CONFIG_EXTENDED_SIZE_CLASSES
-    /* 4096 */ 2, 2, 2, 2,
+    /* 4096 */ 1, 1, 1, 1,
     /* 8192 */ 1, 1, 1, 1,
     /* 16384 */ 1, 1, 1, 1,
 #endif
 };
+
+static size_t get_slots(unsigned class) {
+    return size_class_slots[class];
+}
 
 static const char *const size_class_labels[] = {
     /* 0 */ "malloc 0",
@@ -485,7 +489,7 @@ static inline void *allocate_small(unsigned arena, size_t requested_size) {
     size_t size = info.size ? info.size : 16;
 
     struct size_class *c = &ro.size_class_metadata[arena][info.class];
-    size_t slots = size_class_slots[info.class];
+    size_t slots = get_slots(info.class);
     size_t slab_size = get_slab_size(slots, size);
 
     mutex_lock(&c->lock);
@@ -645,7 +649,7 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
     if (is_zero_size) {
         size = 16;
     }
-    size_t slots = size_class_slots[class];
+    size_t slots = get_slots(class);
     size_t slab_size = get_slab_size(slots, size);
 
     mutex_lock(&c->lock);
@@ -756,8 +760,10 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
                 enqueue_free_slab(c, metadata);
                 mutex_unlock(&c->lock);
                 return;
+            } else {
+                memory_purge(slab, slab_size);
+                // handle out-of-memory by putting it into the empty slabs list
             }
-            // handle out-of-memory by just putting it into the empty slabs list
         }
 
         metadata->next = c->empty_slabs;
@@ -835,10 +841,10 @@ static void regions_quarantine_deallocate_pages(void *p, size_t size, size_t gua
     }
 
     if (unlikely(memory_map_fixed(p, size))) {
-        deallocate_pages(p, size, guard_size);
-        return;
+        memory_purge(p, size);
+    } else {
+        memory_set_name(p, size, "malloc large quarantine");
     }
-    memory_set_name(p, size, "malloc large quarantine");
 
     struct quarantine_info target =
         (struct quarantine_info){(char *)p - guard_size, size + guard_size * 2};
@@ -1125,7 +1131,7 @@ COLD static void init_slow_path(void) {
                 size = 16;
             }
             c->size_divisor = libdivide_u32_gen(size);
-            size_t slab_size = get_slab_size(size_class_slots[class], size);
+            size_t slab_size = get_slab_size(get_slots(class), size);
             c->slab_size_divisor = libdivide_u64_gen(slab_size);
             c->slab_info = allocator_state->slab_info_mapping[arena][class].slab_info;
         }
@@ -1249,7 +1255,7 @@ static void deallocate_large(void *p, const size_t *expected_size) {
     regions_quarantine_deallocate_pages(p, size, guard_size);
 }
 
-static int alloc_aligned(unsigned arena, void **memptr, size_t alignment, size_t size, size_t min_alignment) {
+static int allocate_aligned(unsigned arena, void **memptr, size_t alignment, size_t size, size_t min_alignment) {
     if ((alignment - 1) & alignment || alignment < min_alignment) {
         return EINVAL;
     }
@@ -1295,33 +1301,42 @@ static int alloc_aligned(unsigned arena, void **memptr, size_t alignment, size_t
     return 0;
 }
 
-static void *alloc_aligned_simple(unsigned arena, size_t alignment, size_t size) {
-    void *ptr;
-    int ret = alloc_aligned(arena, &ptr, alignment, size, 1);
-    if (ret) {
-        errno = ret;
-        return NULL;
-    }
-    return ptr;
-}
-
-static size_t adjust_size_for_canaries(size_t size) {
+static size_t adjust_size_for_canary(size_t size) {
     if (size > 0 && size <= MAX_SLAB_SIZE_CLASS) {
         return size + canary_size;
     }
     return size;
 }
 
+static int alloc_aligned(void **memptr, size_t alignment, size_t size, size_t min_alignment) {
+    unsigned arena = init();
+    thread_unseal_metadata();
+    size = adjust_size_for_canary(size);
+    int ret = allocate_aligned(arena, memptr, alignment, size, min_alignment);
+    thread_seal_metadata();
+    return ret;
+}
+
+static void *alloc_aligned_simple(size_t alignment, size_t size) {
+    void *ptr;
+    int ret = alloc_aligned(&ptr, alignment, size, 1);
+    if (unlikely(ret)) {
+        errno = ret;
+        return NULL;
+    }
+    return ptr;
+}
+
 static inline void *alloc(size_t size) {
     unsigned arena = init();
     thread_unseal_metadata();
-    size = adjust_size_for_canaries(size);
     void *p = allocate(arena, size);
     thread_seal_metadata();
     return p;
 }
 
 EXPORT void *h_malloc(size_t size) {
+    size = adjust_size_for_canary(size);
     return alloc(size);
 }
 
@@ -1331,11 +1346,8 @@ EXPORT void *h_calloc(size_t nmemb, size_t size) {
         errno = ENOMEM;
         return NULL;
     }
-    unsigned arena = init();
-    thread_unseal_metadata();
-    total_size = adjust_size_for_canaries(total_size);
-    void *p = allocate(arena, total_size);
-    thread_seal_metadata();
+    total_size = adjust_size_for_canary(total_size);
+    void *p = alloc(total_size);
     if (!ZERO_ON_FREE && likely(p != NULL) && total_size && total_size <= MAX_SLAB_SIZE_CLASS) {
         memset(p, 0, total_size - canary_size);
     }
@@ -1343,11 +1355,10 @@ EXPORT void *h_calloc(size_t nmemb, size_t size) {
 }
 
 EXPORT void *h_realloc(void *old, size_t size) {
+    size = adjust_size_for_canary(size);
     if (old == NULL) {
         return alloc(size);
     }
-
-    size = adjust_size_for_canaries(size);
 
     if (size > MAX_SLAB_SIZE_CLASS) {
         size = get_large_size_class(size);
@@ -1485,47 +1496,27 @@ EXPORT void *h_realloc(void *old, size_t size) {
 }
 
 EXPORT int h_posix_memalign(void **memptr, size_t alignment, size_t size) {
-    unsigned arena = init();
-    thread_unseal_metadata();
-    size = adjust_size_for_canaries(size);
-    int ret = alloc_aligned(arena, memptr, alignment, size, sizeof(void *));
-    thread_seal_metadata();
-    return ret;
+    return alloc_aligned(memptr, alignment, size, sizeof(void *));
 }
 
 EXPORT void *h_aligned_alloc(size_t alignment, size_t size) {
-    unsigned arena = init();
-    thread_unseal_metadata();
-    size = adjust_size_for_canaries(size);
-    void *p = alloc_aligned_simple(arena, alignment, size);
-    thread_seal_metadata();
-    return p;
+    return alloc_aligned_simple(alignment, size);
 }
 
 EXPORT void *h_memalign(size_t alignment, size_t size) ALIAS(h_aligned_alloc);
 
 #ifndef __ANDROID__
 EXPORT void *h_valloc(size_t size) {
-    unsigned arena = init();
-    thread_unseal_metadata();
-    size = adjust_size_for_canaries(size);
-    void *p = alloc_aligned_simple(arena, PAGE_SIZE, size);
-    thread_seal_metadata();
-    return p;
+    return alloc_aligned_simple(PAGE_SIZE, size);
 }
 
 EXPORT void *h_pvalloc(size_t size) {
     size = PAGE_CEILING(size);
-    if (!size) {
+    if (unlikely(!size)) {
         errno = ENOMEM;
         return NULL;
     }
-    unsigned arena = init();
-    thread_unseal_metadata();
-    size = adjust_size_for_canaries(size);
-    void *p = alloc_aligned_simple(arena, PAGE_SIZE, size);
-    thread_seal_metadata();
-    return p;
+    return alloc_aligned_simple(PAGE_SIZE, size);
 }
 #endif
 
@@ -1555,7 +1546,7 @@ EXPORT void h_free_sized(void *p, size_t expected_size) {
         return;
     }
 
-    expected_size = adjust_size_for_canaries(expected_size);
+    expected_size = adjust_size_for_canary(expected_size);
 
     if (p < get_slab_region_end() && p >= ro.slab_region_start) {
         thread_unseal_metadata();
@@ -1579,7 +1570,7 @@ static inline void memory_corruption_check_small(const void *p) {
     if (is_zero_size) {
         size = 16;
     }
-    size_t slab_size = get_slab_size(size_class_slots[class], size);
+    size_t slab_size = get_slab_size(get_slots(class), size);
 
     mutex_lock(&c->lock);
 
@@ -1619,7 +1610,6 @@ EXPORT size_t h_malloc_usable_size(H_MALLOC_USABLE_SIZE_CONST void *p) {
 
     if (p < get_slab_region_end() && p >= ro.slab_region_start) {
         thread_unseal_metadata();
-
         memory_corruption_check_small(p);
         thread_seal_metadata();
 
@@ -1660,7 +1650,7 @@ EXPORT size_t h_malloc_object_size(void *p) {
         mutex_lock(&c->lock);
 
         struct slab_metadata *metadata = get_metadata(c, p);
-        size_t slab_size = get_slab_size(size_class_slots[class], size_class);
+        size_t slab_size = get_slab_size(get_slots(class), size_class);
         void *slab = get_slab(c, slab_size, metadata);
         size_t slot = libdivide_u32_do((const char *)p - (const char *)slab, &c->size_divisor);
 
@@ -1742,7 +1732,7 @@ EXPORT int h_malloc_trim(UNUSED size_t pad) {
         for (unsigned class = 1; class < N_SIZE_CLASSES; class++) {
             struct size_class *c = &ro.size_class_metadata[arena][class];
             size_t size = size_classes[class];
-            size_t slab_size = get_slab_size(size_class_slots[class], size);
+            size_t slab_size = get_slab_size(get_slots(class), size);
 
             mutex_lock(&c->lock);
 
@@ -1802,12 +1792,27 @@ EXPORT int h_malloc_trim(UNUSED size_t pad) {
 
 EXPORT void h_malloc_stats(void) {}
 
-#if defined(__GLIBC__) || defined(__ANDROID__)
+// glibc mallinfo is broken and replaced with mallinfo2
+#if defined(__GLIBC__)
+EXPORT struct mallinfo h_mallinfo(void) {
+    return (struct mallinfo){0};
+}
+
+#if __GLIBC_PREREQ(2, 33)
+#define HAVE_MALLINFO2
+#endif
+#endif
+
+#if defined(HAVE_MALLINFO2) || defined(__ANDROID__)
+#ifndef __GLIBC__
 EXPORT struct mallinfo h_mallinfo(void) {
     struct mallinfo info = {0};
+#else
+EXPORT struct mallinfo2 h_mallinfo2(void) {
+    struct mallinfo2 info = {0};
+#endif
 
-    // glibc mallinfo type definition and implementation are both broken
-#if CONFIG_STATS && !defined(__GLIBC__)
+#if CONFIG_STATS
     if (!is_init()) {
         return info;
     }
@@ -2001,6 +2006,7 @@ COLD EXPORT void h_malloc_enable(void) {
 
 #ifdef __GLIBC__
 COLD EXPORT void *h_malloc_get_state(void) {
+    errno = ENOSYS;
     return NULL;
 }
 

@@ -144,7 +144,7 @@ large number of guard pages created by hardened\_malloc. This can be done in
 `init.rc` (`system/core/rootdir/init.rc`) near the other virtual memory
 configuration:
 
-    write /proc/sys/vm/max_map_count 524240
+    write /proc/sys/vm/max_map_count 1048576
 
 This is unnecessary if you set `CONFIG_GUARD_SLABS_INTERVAL` to a very large
 value in the build configuration.
@@ -589,10 +589,10 @@ retaining the isolation.
 
 | size class | worst case internal fragmentation | slab slots | slab size | internal fragmentation for slabs |
 | - | - | - | - | - |
-| 20480 | 20.0% | 2 | 40960 | 0.0% |
-| 24576 | 16.66% | 2 | 49152 | 0.0% |
-| 28672 | 14.28% | 2 | 57344 | 0.0% |
-| 32768 | 12.5% | 2 | 65536 | 0.0% |
+| 20480 | 20.0% | 1 | 20480 | 0.0% |
+| 24576 | 16.66% | 1 | 24576 | 0.0% |
+| 28672 | 14.28% | 1 | 28672 | 0.0% |
+| 32768 | 12.5% | 1 | 32768 | 0.0% |
 | 40960 | 20.0% | 1 | 40960 | 0.0% |
 | 49152 | 16.66% | 1 | 49152 | 0.0% |
 | 57344 | 14.28% | 1 | 57344 | 0.0% |
@@ -1008,7 +1008,7 @@ System calls used by all build configurations:
 * `mremap(old, old_size, new_size, MREMAP_MAYMOVE|MREMAP_FIXED, new)`
 * `munmap`
 * `write(STDERR_FILENO, buf, len)` (before aborting due to memory corruption)
-* `madvise(ptr, size, MADV_DONTNEED)` for `malloc_trim` with slab quarantines
+* `madvise(ptr, size, MADV_DONTNEED)`
 
 The main distinction from a typical malloc implementation is the use of
 getrandom. A common compatibility issue is that existing system call whitelists
