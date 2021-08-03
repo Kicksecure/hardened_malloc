@@ -1,7 +1,0 @@
-## Copyright (C) 2020 - 2021 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
-## See the file COPYING for copying conditions.
-
-## Keep environment variable MAN_DISABLE_SECCOMP to work arround `man` `seccomp`
-## bug when using `sudo` so it is passed to APT and eventually to `man`.
-## See /etc/X11/Xsession.d/50hardened-malloc for more information.
-Defaults:ALL env_keep += "MAN_DISABLE_SECCOMP"
