@@ -1,3 +1,57 @@
+commit a12d0612777546a78fc5c22ebb049459928c2cb1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 12:48:53 2021 -0400
+
+    move /usr/lib/helper-scripts and /usr/lib/curl-scripts to /usr/libexec/helper-scripts as per lintian FHS
+
+commit 2b8b3179827c7515572ac8e95305b09d1bc5ac77
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 07:09:25 2021 -0400
+
+    remove `man` workaround /
+    remove `export MAN_DISABLE_SECCOMP=1`
+    
+    since no longer required
+    
+    Fixed in `man` upstream and in Debian bullseye.
+    
+    https://savannah.nongnu.org/bugs/index.php?56767
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/105
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/109
+    https://git.savannah.nongnu.org/cgit/man-db.git/tree/lib/sandbox.c#n142
+
+commit fe80909a10ad629d3417b18146f5b9b5e29ed556
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 06:30:21 2021 -0400
+
+    llvm-7-dev -> llvm-11-dev
+    
+    https://github.com/GrapheneOS/hardened_malloc/issues/89#issuecomment-891720094
+
+commit 1a9832179541615f9bce9a245a903ddd98e97104
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Aug 3 05:48:21 2021 -0400
+
+    bullseye
+
+commit a037d1ad0f3205d2f68768d816405285a83da1e2
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 1 16:32:01 2021 -0400
+
+    bullseye
+
+commit c5ef96a364a914b40decced9f3195e1eedd26e71
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Aug 1 16:24:30 2021 -0400
+
+    readme
+
+commit f12cea0f2f57c32963ca34db21813a48d281b979
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun May 23 14:47:07 2021 -0400
+
+    bumped changelog version
+
 commit d780417209eb3bfe907cb1b1ddb567415882fa3e
 Merge: 7bee4a9 27fcfcc
 Author: Patrick Schleizer <adrelanos@whonix.org>
