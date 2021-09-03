@@ -45,7 +45,7 @@ Package: hardened-malloc-kicksecure-enable
 ## being a mix of 'Architecture: any' and 'Architecture: all' yet.
 Architecture: any
 Depends: hardened-malloc, helper-scripts, ${shlibs:Depends}, ${misc:Depends}
-Description: enables Hardened Malloc
+Description: enables Hardened Malloc Kicksecure
  Adds /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so to
  /etc/ld.so.preload systemd wide configuration file.
  .
