@@ -1,3 +1,21 @@
+commit d2728075463dfad4ab2d688b402a58758a353b2d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Sep 11 16:47:33 2021 -0400
+
+    `Architecture: any` -> `Architecture: amd64`
+
+commit 406d23642762ab9fef8a4cac81816caef26e1aea
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Sep 11 16:32:51 2021 -0400
+
+    readme
+
+commit e6dcc9a528816799d62142df1344efd71a9371db
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Sep 4 11:58:49 2021 -0400
+
+    bumped changelog version
+
 commit 09f2d937e05ea99114258eaf72a75aa247de8279
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Sep 3 06:11:11 2021 -0400
