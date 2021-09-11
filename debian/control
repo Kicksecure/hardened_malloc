@@ -13,7 +13,7 @@ Standards-Version: 4.5.1
 Rules-Requires-Root: no
 
 Package: hardened-malloc
-Architecture: any
+Architecture: amd64
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: security-focused general purpose memory allocator
  This is a security-focused general purpose memory allocator providing the
@@ -43,7 +43,7 @@ Description: security-focused general purpose memory allocator
 Package: hardened-malloc-kicksecure-enable
 ## Actually is 'Architecture: all' but genmkfile cannot handle that a package
 ## being a mix of 'Architecture: any' and 'Architecture: all' yet.
-Architecture: any
+Architecture: amd64
 Depends: hardened-malloc, helper-scripts, ${shlibs:Depends}, ${misc:Depends}
 Description: enables Hardened Malloc Kicksecure
  Adds /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so to
