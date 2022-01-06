@@ -1,3 +1,293 @@
+commit c921c71fe2d0e43dd154368d14e01a6d6cac87a6
+Merge: 14f63b3 c6af50d
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jan 6 15:25:22 2022 -0500
+
+    Merge tag '9'
+    
+    9
+
+commit c6af50d0881c58b5e5d139c96ee446373dac42df
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 01:29:12 2022 -0500
+
+    use unsigned for ffzl definition
+    
+    This makes more sense and avoids clang tidy conversion warnings.
+
+commit 8ae78237aee18491d488bc7c734e41937c7930f0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 00:54:43 2022 -0500
+
+    avoid unnecessarily mixing 32-bit and 64-bit ints
+    
+    It's ever so slightly faster to stick to stick to 64-bit arithmetic and
+    it avoids clang tidy being unhappy about the implicit widening.
+
+commit 3f8e9d3184bccfd0d75b0498e6c1e21a2c60085a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 00:31:46 2022 -0500
+
+    make MREMAP_MOVE_THRESHOLD into size_t constant
+    
+    This avoids a clang-tidy warning and is a bit cleaner.
+
+commit 1e526fc36b6310e40bfb44f1b5e0218e557a4935
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 00:27:49 2022 -0500
+
+    disable incredibly impractical clang-tidy check
+    
+    bugprone-easily-swappable-parameters is completely impractical for real
+    world usage. It's a reasonable thing to consider as part of API design
+    but it mostly applies to having APIs taking a lot of parameters. It's
+    unreasonable to disallow APIs simply taking 2 integer parameters even as
+    a loose guideline.
+
+commit c5be4b1888768738123cd864176b73a51302e50f
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Jan 2 13:30:34 2022 +0100
+
+    Fix two mundane clang warnings in the testsuite
+
+commit ffdf7b1ee18e5295fb4c6f67f4ff3c9490a906a5
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Jan 2 13:39:42 2022 +0100
+
+    Make the testsuite work for read-after-free
+    
+    This commit makes the testsuite fail if
+    the read-after-free tests are failing, instead
+    of simply printing some info.
+
+commit 2d56c1de01ac9ca13fb5aa09b9ce2b8313b17413
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Jan 2 13:51:25 2022 +0100
+
+    Fix a couple of mundane typo in the readme
+
+commit 3878f4a5f4105c44e3bf5349cff636b5ba1e0697
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sat Jan 1 17:25:25 2022 +0100
+
+    Don't ignore the return value of the testsuite
+
+commit de7a3b6e5a6b2f2779809f82591f43bc647c9ea0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Jan 1 23:18:52 2022 -0500
+
+    enable sized deallocation for sized deletion test
+    
+    Clang doesn't currently enable sized deallocation by default like GCC.
+
+commit 9142a9376b9b4d34950a94f49a4d6b7260c408c2
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Thu Dec 30 20:07:14 2021 +0100
+
+    Add a bunch of const qualifiers
+
+commit 75e26afdb6f50373414228baa9a8cf07188db197
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Dec 30 19:17:23 2021 -0500
+
+    remove legacy safe_flag check for -fno-plt
+    
+    This is supported by the minimum versions of the dependencies.
+
+commit cff1d6d4b5715d0f3d59c46fd11b2a3f8686888e
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Tue Dec 28 12:27:28 2021 +0100
+
+    Add a test to prove that hardened_malloc handles too-large-to-be-true allocations
+    
+    This pattern, used by https://github.com/kaist-hacking/HardsHeap,
+    uncovered bugs in other memory allocators.
+
+commit 75952581ee2391438b933a4d4021d7f2f4f43724
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Dec 26 15:34:37 2021 +0100
+
+    Silence a GCC warning
+    
+    As suggested in https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66425#c34
+
+commit a84d3f5310987c6de4de0a314abd6d6193af76c4
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Thu Dec 23 17:52:35 2021 +0100
+
+    Run the testsuite on musl as well in the CI
+
+commit 0655c1d0249d626e578b795efbac01ef349e6884
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Dec 26 23:37:52 2021 +0100
+
+    Add a missing const
+
+commit 2b25c791eed3c3ae61c4cc31ba87731f29b302fa
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Dec 26 22:30:36 2021 +0100
+
+    Run the CI every day at 2am UTC
+    
+    This should help to catch issues in newer versions
+    of distributions/packages.
+
+commit e816c545ea19f062ef9935c2876bad04a2985ec0
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Dec 26 21:58:19 2021 +0100
+
+    Run the CI in clang
+
+commit 06192ae49943efde3dc3b0970281d900a3189bfb
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Dec 26 22:18:40 2021 +0100
+
+    `make clean` is now thorough
+
+commit 4ccd6f16df4054133b4261a803a2305e12ddf3b3
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Dec 26 16:24:38 2021 -0500
+
+    always enable C++17
+    
+    The safe_flag check doesn't work properly for C++ flags with Clang so
+    this wasn't getting enabled despite the conditional compilation being
+    removed from the code, leading to breaking Clang builds.
+
+commit 9966adbdada3ecb15c7f377fce89686bdae72aca
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Thu Dec 23 20:44:45 2021 +0100
+
+    Add another ifdef for GNU extension
+
+commit 769e01fc4bacd4c6b6ffd6bbc36ff913844fa3b7
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Thu Dec 23 18:27:18 2021 +0100
+
+    Don't use mallinfo on non-android and non-glibc
+
+commit 460fef456d70d315176c53a908c992444ac23ba1
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Nov 23 15:42:29 2021 -0500
+
+    only Android 12 is supported
+
+commit 1a650b0317dfe98a2a7771bd73300003d6cbd6d0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Nov 11 22:17:56 2021 -0500
+
+    update copyright notice
+
+commit fa46a7a85d6eb54284b086550268d66dbf3e1056
+Author: Lelmister101 <92394696+Lelmister101@users.noreply.github.com>
+Date:   Sun Dec 5 20:18:18 2021 +0530
+
+    small typo fix
+    
+    “expanded cover” changed to “expanded to cover”
+
+commit d8817417cc099bdf47605a676067a8cf4f95bf23
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Nov 23 15:59:52 2021 -0500
+
+    use compiler extension instead of C11 noreturn
+    
+    C11 noreturn isn't available in C++.
+
+commit 7106bff27f304d12f771d67b3a51831f7fd7b2d8
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Nov 23 15:53:03 2021 -0500
+
+    update required dependencies
+
+commit 1bdbb2d3f7c0aec52d4f2d4f4cb546ff8707c71f
+Author: Lelmister101 <92394696+Lelmister101@users.noreply.github.com>
+Date:   Tue Nov 23 16:09:03 2021 +0530
+
+    minor typo fix
+    
+    “entirely independently arenas” changed to “entirely independent arenas”
+
+commit 14f63b3c87e1c38de5ccab20fa4f6717e9b0e506
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Tue Nov 9 14:32:30 2021 -0500
+
+    readme
+
+commit a33d2ca97d119ef657207fc27248db4c3103531f
+Author: Thibaut Sautereau <thibaut@sautereau.fr>
+Date:   Tue Nov 2 20:22:05 2021 +0100
+
+    Fix CPPFLAGS in test Makefile
+    
+    In particular, the _GNU_SOURCE feature test macro needs to be set in
+    order to correctly define mmap(2) flags such as MAP_ANONYMOUS.
+    Otherwise, compilation of some test files fails when CPPFLAGS is not
+    defined in the initial user environment, as Make then does not export it
+    from the root Makefile to the sub-make.
+
+commit aa94408cc234767dfcf5a807098d21e1745b7d45
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Oct 19 23:52:18 2021 -0400
+
+    fix wording
+
+commit 8f9305df57ca2943e7476d906ec9ebabb8f2ed85
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Oct 8 13:44:28 2021 -0400
+
+    Android 12 is supported
+
+commit cc0a1e173618075fb814f325f24cd2298e6ae5e4
+Author: anupritaisno1 <www.anuprita804@gmail.com>
+Date:   Wed Aug 18 20:12:14 2021 +0530
+
+    make hardened malloc vendor ramdisk avaiable
+    
+    Signed-off-by: anupritaisno1 <www.anuprita804@gmail.com>
+
+commit 3b72a4f81011cbebc3532b8b16706756ea29405a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 30 11:05:47 2021 -0400
+
+    set C / C++ standard parameter for clang-tidy
+
+commit e41d37c3de9a7998b6644b61a3dc8e90b2ca9080
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 30 10:57:05 2021 -0400
+
+    remove unnecessary else
+
+commit 23969727d8c6b4581d17edb00dac909931f5dae0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 30 10:55:12 2021 -0400
+
+    disable readability-function-cognitive-complexity
+
+commit 4d30b491e3f63b44220dc275a664a42f64c5a8c0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 30 01:18:36 2021 -0400
+
+    set up dependabot for GitHub Actions
+
+commit 11207a9c98a8093b91f5b45b60da2944eda59fb3
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 30 01:09:36 2021 -0400
+
+    add GitHub workflow for building and running tests
+
+commit 801e8d959fdcf426875a5b03ba28bd09b86c4b6b
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 30 01:16:10 2021 -0400
+
+    disable mallinfo2 test for old glibc
+
+commit a7984633547e9e5b3006244a4b97c816ac2881d9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Sep 11 18:43:35 2021 -0400
+
+    bumped changelog version
+
 commit d2728075463dfad4ab2d688b402a58758a353b2d
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Sep 11 16:47:33 2021 -0400
@@ -9,6 +299,12 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Sep 11 16:32:51 2021 -0400
 
     readme
+
+commit 8dfea34fc0067d144f98ecac773de7076f786e10
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Sep 5 01:59:45 2021 -0400
+
+    current AOSP stable branch is Android 11 QPR3
 
 commit e6dcc9a528816799d62142df1344efd71a9371db
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -94,6 +390,12 @@ Date:   Sun Aug 1 16:24:30 2021 -0400
 
     readme
 
+commit 4d6456cf5841e040b120f7dd9216cc916f608e45
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sat Jul 17 14:58:23 2021 -0400
+
+    update libdivide to 5.0.0
+
 commit f12cea0f2f57c32963ca34db21813a48d281b979
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun May 23 14:47:07 2021 -0400
@@ -108,6 +410,24 @@ Date:   Sun May 23 14:28:28 2021 -0400
     Merge tag '8'
     
     8
+
+commit be6dde66f969ef921843abbd9e6281e4087d3889
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri May 21 09:07:28 2021 -0400
+
+    fix missing include for Intel MPK support
+
+commit e0ecacff451912a32a1a63f9d9a8d7f63546cfd8
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri May 21 09:00:39 2021 -0400
+
+    drop support for legacy C++ versions
+
+commit 050871122b375f5cb162d302381a330f26cbe2a7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu May 13 19:50:26 2021 -0400
+
+    update non-Android max_map_count recommendation
 
 commit 27fcfccb6722ca5f31be1a30b6fc5d4d8f863e25
 Author: Daniel Micay <danielmicay@gmail.com>
