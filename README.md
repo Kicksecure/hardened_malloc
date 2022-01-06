@@ -32,7 +32,7 @@ to much less metadata overhead and memory waste from fragmentation than a more
 traditional allocator design. It aims to provide decent overall performance
 with a focus on long-term performance and memory usage rather than allocator
 micro-benchmarks. It offers scalability via a configurable number of entirely
-independently arenas, with the internal locking within arenas further divided
+independent arenas, with the internal locking within arenas further divided
 up per size class.
 
 This project currently supports Bionic (Android), musl and glibc. It may
@@ -65,12 +65,12 @@ used instead as this allocator fundamentally doesn't support that environment.
 
 ## Dependencies
 
-Debian stable (currently Debian 10) determines the most ancient set of
+Debian stable (currently Debian 11) determines the most ancient set of
 supported dependencies:
 
-* glibc 2.28
-* Linux 4.19
-* Clang 7.0 or GCC 8.3.0
+* glibc 2.31
+* Linux 5.10
+* Clang 11.0.1 or GCC 10.2.1
 
 However, using more recent releases is highly recommended. Older versions of
 the dependencies may be compatible at the moment but are not tested and will
@@ -80,9 +80,8 @@ For external malloc replacement with musl, musl 1.1.20 is required. However,
 there will be custom integration offering better performance in the future
 along with other hardening for the C standard library implementation.
 
-For Android, only the current generation, actively developed maintenance
-branch of the Android Open Source Project will be supported, which currently
-means `android11-qpr2-release`.
+For Android, only the current generation, actively developed maintenance branch of the Android
+Open Source Project will be supported, which currently means `android12-release`.
 
 The Linux kernel's implementation of Memory Protection Keys was severely broken
 before Linux 5.0. The `CONFIG_SEAL_METADATA` feature should only be enabled for
@@ -101,7 +100,7 @@ executables using glibc or musl:
     ./preload.sh krita --new-image RGBA,U8,500,500
 
 It can be necessary to substantially increase the `vm.max_map_count` sysctl to
-accomodate the large number of mappings caused by guard slabs and large
+accommodate the large number of mappings caused by guard slabs and large
 allocation guard regions. The number of mappings can also be drastically
 reduced via a significant increase to `CONFIG_GUARD_SLABS_INTERVAL` but the
 feature has a low performance and memory usage cost so that isn't recommended.
@@ -139,7 +138,7 @@ between performance and security. However, this reduces security for threat
 models where persistent state is untrusted, i.e. verified boot and attestation
 (see the [attestation sister project](https://attestation.app/about)).
 
-Make sure to raise `vm.max_map_count` substantially too to accomodate the very
+Make sure to raise `vm.max_map_count` substantially too to accommodate the very
 large number of guard pages created by hardened\_malloc. This can be done in
 `init.rc` (`system/core/rootdir/init.rc`) near the other virtual memory
 configuration:
@@ -170,11 +169,11 @@ generally not a recommended approach for production usage. The recommendation
 is to enable it globally and make exceptions for performance critical cases by
 running the application in a container / namespace without it enabled.
 
-Make sure to raise `vm.max_map_count` substantially too to accomodate the very
+Make sure to raise `vm.max_map_count` substantially too to accommodate the very
 large number of guard pages created by hardened\_malloc. As an example, in
 `/etc/sysctl.d/hardened_malloc.conf`:
 
-    vm.max_map_count = 524240
+    vm.max_map_count = 1048576
 
 This is unnecessary if you set `CONFIG_GUARD_SLABS_INTERVAL` to a very large
 value in the build configuration.
@@ -495,7 +494,7 @@ ChaCha8 is a great fit because it's extremely fast across platforms without
 relying on hardware support or complex platform-specific code. The security
 margins of ChaCha20 would be completely overkill for the use case. Using
 ChaCha8 avoids needing to resort to a non-cryptographically secure PRNG or
-something without a lot of scrunity. The current implementation is simply the
+something without a lot of scrutiny. The current implementation is simply the
 reference implementation of ChaCha8 converted into a pure keystream by ripping
 out the XOR of the message into the keystream.
 
@@ -715,7 +714,7 @@ freeing as there would be if the kernel supported these features directly.
 ## Memory tagging
 
 Integrating extensive support for ARMv8.5 memory tagging is planned and this
-section will be expanded cover the details on the chosen design. The approach
+section will be expanded to cover the details on the chosen design. The approach
 for slab allocations is currently covered, but it can also be used for the
 allocator metadata region and large allocations.
 
@@ -780,7 +779,7 @@ would be incremented to 5 if one of the adjacent tags was 4):
 
     | 3  | 4  | 15 | 7  | 14 | 15 |
 
-The last slot is randomly chosen for the next alocation, and is assigned the
+The last slot is randomly chosen for the next allocation, and is assigned the
 random value 14. However, it's placed next to an allocation with the tag 14 so
 the tag is incremented and wraps around to 0:
 

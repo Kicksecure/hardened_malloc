@@ -6,10 +6,10 @@
 #include "test_util.h"
 
 OPTNONE static void leak_memory(void) {
-    (void)malloc(1024 * 1024 * 1024);
-    (void)malloc(16);
-    (void)malloc(32);
-    (void)malloc(4096);
+    (void)!malloc(1024 * 1024 * 1024);
+    (void)!malloc(16);
+    (void)!malloc(32);
+    (void)!malloc(4096);
 }
 
 static void *do_work(void *p) {
@@ -26,5 +26,7 @@ int main(void) {
         pthread_join(thread[i], NULL);
     }
 
+#if defined(__GLIBC__) || defined(__ANDROID__)
     malloc_info(0, stdout);
+#endif
 }

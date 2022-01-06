@@ -1,0 +1,31 @@
+name: Build and run tests
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  build-ubuntu-gcc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: make test
+  build-ubuntu-clang:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: CC=clang CXX=clang++ make test
+  build-musl:
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: apk add build-base python3
+      - name: Build
+        run: make test

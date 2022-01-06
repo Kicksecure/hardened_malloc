@@ -26,7 +26,7 @@ $(shell $(CC) $(if $(filter clang,$(CC)),-Werror=unknown-warning-option) -E $1 -
 endef
 
 CPPFLAGS := $(CPPFLAGS) -D_GNU_SOURCE -I include
-SHARED_FLAGS := -O3 -flto -fPIC -fvisibility=hidden $(call safe_flag,-fno-plt) \
+SHARED_FLAGS := -O3 -flto -fPIC -fvisibility=hidden -fno-plt \
     $(call safe_flag,-fstack-clash-protection) -fstack-protector-strong -pipe -Wall -Wextra \
     $(call safe_flag,-Wcast-align=strict,-Wcast-align) -Wcast-qual -Wwrite-strings
 
@@ -43,7 +43,7 @@ ifeq ($(CONFIG_NATIVE),true)
 endif
 
 CFLAGS := $(CFLAGS) -std=c11 $(SHARED_FLAGS) -Wmissing-prototypes
-CXXFLAGS := $(CXXFLAGS) $(call safe_flag,-std=c++17,-std=c++14) $(SHARED_FLAGS)
+CXXFLAGS := $(CXXFLAGS) -std=c++17 $(SHARED_FLAGS)
 LDFLAGS := $(LDFLAGS) -Wl,--as-needed,-z,defs,-z,relro,-z,now,-z,nodlopen,-z,text
 
 SOURCES := chacha.c h_malloc.c memory.c pages.c random.c util.c
@@ -129,13 +129,15 @@ util.o: util.c util.h
 check: tidy
 
 tidy:
-	clang-tidy $(SOURCES) -- $(CPPFLAGS)
+	clang-tidy --extra-arg=-std=c11 $(filter %.c,$(SOURCES)) -- $(CPPFLAGS)
+	clang-tidy --extra-arg=-std=c++17 $(filter %.cc,$(SOURCES)) -- $(CPPFLAGS)
 
 clean:
 	rm -f libhardened_malloc.so $(OBJECTS)
+	make -C test/ clean
 
 test: libhardened_malloc.so
 	make -C test/
-	-python3 -m unittest discover --start-directory test/
+	python3 -m unittest discover --start-directory test/
 
 .PHONY: check clean tidy test
