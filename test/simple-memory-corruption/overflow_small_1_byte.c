@@ -1,3 +1,4 @@
+#include <malloc.h>
 #include <stdlib.h>
 
 #include "../test_util.h"
@@ -7,7 +8,8 @@ OPTNONE int main(void) {
     if (!p) {
         return 1;
     }
-    *(p + 8 + 7) = 0;
+    size_t size = malloc_usable_size(p);
+    *(p + size) = 1;
     free(p);
     return 0;
 }

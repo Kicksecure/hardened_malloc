@@ -48,9 +48,10 @@ extern "C" {
 #endif
 
 // C standard
-void *h_malloc(size_t size);
-void *h_calloc(size_t nmemb, size_t size);
-void *h_realloc(void *ptr, size_t size);
+__attribute__((malloc)) __attribute__((alloc_size(1))) void *h_malloc(size_t size);
+__attribute__((malloc)) __attribute__((alloc_size(1, 2))) void *h_calloc(size_t nmemb, size_t size);
+__attribute__((alloc_size(2))) void *h_realloc(void *ptr, size_t size);
+__attribute__((malloc)) __attribute__((alloc_size(2))) __attribute__((alloc_align(1)))
 void *h_aligned_alloc(size_t alignment, size_t size);
 void h_free(void *ptr);
 
@@ -76,10 +77,11 @@ int h_malloc_info(int options, FILE *fp);
 #endif
 
 // obsolete glibc extensions
+__attribute__((malloc)) __attribute__((alloc_size(2))) __attribute__((alloc_align(1)))
 void *h_memalign(size_t alignment, size_t size);
 #ifndef __ANDROID__
-void *h_valloc(size_t size);
-void *h_pvalloc(size_t size);
+__attribute__((malloc)) __attribute__((alloc_size(1))) void *h_valloc(size_t size);
+__attribute__((malloc)) void *h_pvalloc(size_t size);
 #endif
 #ifdef __GLIBC__
 void h_cfree(void *ptr) __THROW;
@@ -102,10 +104,10 @@ void h_malloc_enable(void);
 // hardened_malloc extensions
 
 // return an upper bound on object size for any pointer based on malloc metadata
-size_t h_malloc_object_size(void *ptr);
+size_t h_malloc_object_size(const void *ptr);
 
 // similar to malloc_object_size, but avoiding locking so the results are much more limited
-size_t h_malloc_object_size_fast(void *ptr);
+size_t h_malloc_object_size_fast(const void *ptr);
 
 // The free function with an extra parameter for passing the size requested at
 // allocation time.

@@ -13,7 +13,7 @@ CPPFLAGS += -D_GNU_SOURCE \
 
 LDLIBS := -lhardened_malloc
 
-LDFLAGS := -Wl,-L$(dir)../../,-R,$(dir)../../
+LDFLAGS := -Wl,-L$(dir)../../out,-R,$(dir)../../out
 
 EXECUTABLES := \
     double_free_large \
@@ -34,11 +34,15 @@ EXECUTABLES := \
     invalid_free_unprotected \
     invalid_free_small_region \
     invalid_free_small_region_far \
+    uninitialized_read_small \
+    uninitialized_read_large \
     uninitialized_free \
     uninitialized_realloc \
     uninitialized_malloc_usable_size \
-    eight_byte_overflow_small \
-    eight_byte_overflow_large \
+    overflow_large_1_byte \
+    overflow_large_8_byte \
+    overflow_small_1_byte \
+    overflow_small_8_byte \
     string_overflow \
     delete_type_size_mismatch \
     unaligned_malloc_usable_size_small \
