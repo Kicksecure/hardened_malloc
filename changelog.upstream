@@ -1,3 +1,72 @@
+commit b9d66ce4dd654e079b0d5d00a3e6bc5a6102751d
+Merge: becde94 17891d7
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jan 13 08:41:38 2022 -0500
+
+    Merge tag '10'
+    
+    10
+
+commit 17891d743e2ae7f5c8daf92328da74cfaf40ebca
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 10:20:47 2022 -0500
+
+    switch from c11 to c17 standard
+
+commit efd71e70c7213d092a9fa3634972cc1f577944ba
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 08:58:00 2022 -0500
+
+    update documentation based on light configuration
+
+commit a6d27848af0ae0a9305cac8ad24a8bcefdabb9a1
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 08:44:39 2022 -0500
+
+    wrap overly long line
+
+commit 110126d7f0f6fc6dca444fd436d0858632463f33
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 08:43:28 2022 -0500
+
+    README: fix path to configuration templates
+
+commit a2bdb4da277035306d1814a4eb9b43694ecf17f5
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 08:41:21 2022 -0500
+
+    update gitignore for renamed / added tests
+
+commit 0c0561e563d64ef9d9fda35f5c8f9f4620aca3f7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 08:41:12 2022 -0500
+
+    update gitignore for config template system
+
+commit 5a577e9ee06e0995902db6ad5fd925ad8828fd35
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 12 08:38:33 2022 -0500
+
+    document configuration template system
+
+commit b3372e157645d3bdb441927f9c3b8220aae6b428
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 9 11:08:56 2022 -0500
+
+    add configuration template system
+
+commit 052b7568408b035a3676f35ac78263606385dbdd
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Tue Jan 4 18:39:49 2022 +0100
+
+    Fix two warnings
+
+commit becde94f01af7df335e477f89a869782eb399ad1
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jan 6 15:26:00 2022 -0500
+
+    bumped changelog version
+
 commit c921c71fe2d0e43dd154368d14e01a6d6cac87a6
 Merge: 14f63b3 c6af50d
 Author: Patrick Schleizer <adrelanos@whonix.org>
@@ -6,6 +75,126 @@ Date:   Thu Jan 6 15:25:22 2022 -0500
     Merge tag '9'
     
     9
+
+commit 001eb0687b38b624dd8fb8cd235487b24a2ccc16
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Tue Jan 4 17:56:48 2022 +0100
+
+    Fix an unused parameter warning
+
+commit 2a5662948e3c5f67648ce584b40a6280f59afbf7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Jan 4 12:10:59 2022 -0500
+
+    rename bitmap manipulation functions
+
+commit d1c39edc9b15cf45b5ea577747197d9188417deb
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Jan 4 10:14:41 2022 -0500
+
+    use const for malloc_object_size API
+
+commit aa1746a90d864e313ab8965637cff382c2b10130
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Jan 4 10:04:26 2022 -0500
+
+    alloc_size attribute for legacy valloc function
+
+commit f3efc26638e207b4e671c24a7d4a46f827a84d5c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Jan 4 09:56:29 2022 -0500
+
+    add malloc attribute where appropriate
+
+commit 78cbb964d441d9b25120be0a34f05f78f10770df
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Mon Jan 3 17:14:55 2022 +0100
+
+    Add alloc_size and alloc_align attributes
+    
+    This should help a bit the compiler to emit better diagnostics and to improve
+    the correctness of `__builtin_object_size`.
+    
+    See https://clang.llvm.org/docs/AttributeReference.html#alloc-size
+    and https://clang.llvm.org/docs/AttributeReference.html#alloc-align
+
+commit 36dfed3354c14217ac7f93e1ca5abb53cee7f30d
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Tue Jan 4 12:54:25 2022 +0100
+
+    Add aarch64 to the CI
+
+commit 8a500088c661226c7bd47e0c9358df7b1ad60c80
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 21:24:31 2022 -0500
+
+    add missing include for overflow tests
+
+commit c50d06bc6a31f2601ef5302832bcd9776dbd4eb0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 21:23:14 2022 -0500
+
+    comment explaining XOR for 8 byte overflow test
+
+commit 645414cc9f7689ae43f5da935d3f436dc46df716
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 21:20:15 2022 -0500
+
+    add 1 byte overflow tests
+
+commit 13a1f578cb560c358db56cc1e06595f083545e4f
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 21:11:31 2022 -0500
+
+    use calculated size for overflow tests
+    
+    This greatly reduces how much these tests depend on hard-wired knowledge
+    about the size classes.
+
+commit acda766e2ccdeedb7a4a634d84089a1ca1f73b8c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 21:07:24 2022 -0500
+
+    fix small allocation canary overwrite test
+    
+    Overwriting one byte of a canary with 0 has a 1/256 chance of not
+    triggering the expected failure.
+
+commit 5f32942263f1aba8feccee05f5d16900fddbd7f0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 17:56:57 2022 -0500
+
+    get rid of canary_value when canaries are disabled
+
+commit 346529574d88cfc82d3b7ba8c29ea97e6c797e3a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 17:55:05 2022 -0500
+
+    check whole allocation for uninit read large test
+
+commit 16c991b8f75374bcfeae4711d3270e743f5988a6
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 16:11:03 2022 -0500
+
+    use 256k for large allocation tests
+
+commit 5f59ee393523698cc1823b7ad913ea8fd00087e8
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Mon Dec 27 13:17:58 2021 +0100
+
+    Add two tests to check that uninitialized read are zeroed
+
+commit 3696f071a4a136edc9d2baea6ab5fbbd33ced371
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 02:17:04 2022 -0500
+
+    use SLAB_CANARY for conditional checks
+
+commit 7d6663ed80921030a83c5bf82616edcb6350edc4
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Mon Jan 3 01:41:17 2022 -0500
+
+    update copyright notice
 
 commit c6af50d0881c58b5e5d139c96ee446373dac42df
 Author: Daniel Micay <danielmicay@gmail.com>
