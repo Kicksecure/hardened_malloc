@@ -1,3 +1,50 @@
+commit ab02868f921b873870c67b3ae030537b49b1d316
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 09:04:36 2022 -0500
+
+    update for Hardened Malloc Light
+
+commit 949b4c7e8596181cfbde03d0de4d9f2df7d8c961
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 09:03:11 2022 -0500
+
+    refactoring
+
+commit 9141f1f062efedeb4d0cdf0319aa560ec6d8c879
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 09:01:34 2022 -0500
+
+    renamed:    debian/hardened-malloc-kicksecure-enable.install -> debian/hardened-malloc-light-enable.install
+    renamed:    debian/hardened-malloc-kicksecure-enable.postinst -> debian/hardened-malloc-light-enable.postinst
+    renamed:    debian/hardened-malloc-kicksecure-enable.prerm -> debian/hardened-malloc-light-enable.prerm
+
+commit 36f131f2caaa20e222cea5ba29b019d884f7ee32
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 09:00:04 2022 -0500
+
+    rename package hardened-malloc-kicksecure-enable to hardened-malloc-light-enable
+
+commit 2dc1f8d668f2c647ade166b125f566838660e0ed
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 08:53:43 2022 -0500
+
+    legacy
+
+commit 1d8ce334120804ee5d33ad3c2dc38c3c77032b06
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 08:27:12 2022 -0500
+
+    use new upstream supported VARIANT=light
+    
+    (Instead of Kicksecure specific configuration `CONFIG_SLAB_QUARANTINE_RANDOM_LENGTH=0 CONFIG_SLAB_QUARANTINE_QUEUE_LENGTH=0 CONFIG_GUARD_SLABS_INTERVAL=8`,
+    which has now been dropped.)
+
+commit 4da35617671ab959dcb9310d05f5c5a45980bca3
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 08:05:01 2022 -0500
+
+    bumped changelog version
+
 commit 0b8d0c02031b3283f6f30896d92452faa294b973
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Jan 15 08:02:55 2022 -0500
