@@ -44,7 +44,6 @@ Architecture: amd64
 Depends: hardened-malloc, helper-scripts, ${shlibs:Depends}, ${misc:Depends}
 Replaces: hardened-malloc-kicksecure-enable
 Provides: hardened-malloc-kicksecure-enable
-Conflicts: hardened-malloc-kicksecure-enable
 Description: enables Hardened Malloc Light
  Adds /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so to
  /etc/ld.so.preload systemd wide configuration file.
@@ -56,8 +55,6 @@ Description: enables Hardened Malloc Light
  Other than doing that this is an empty package.
 
 Package: hardened-malloc-kicksecure-enable
-## Actually is 'Architecture: all' but genmkfile cannot handle that a package
-## being a mix of 'Architecture: any' and 'Architecture: all' yet.
 Architecture: amd64
 Depends: hardened-malloc-light-enable, ${shlibs:Depends}, ${misc:Depends}
 Section: oldlibs
