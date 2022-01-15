@@ -59,8 +59,7 @@ Package: hardened-malloc-kicksecure-enable
 ## Actually is 'Architecture: all' but genmkfile cannot handle that a package
 ## being a mix of 'Architecture: any' and 'Architecture: all' yet.
 Architecture: amd64
-Depends: hardened-malloc-light-enable | dummy-dependency-hardened-malloc,
- ${shlibs:Depends}, ${misc:Depends}
+Depends: hardened-malloc-light-enable, ${shlibs:Depends}, ${misc:Depends}
 Section: oldlibs
 Description: transitional package
  This is a transitional package. It can safely be removed.
