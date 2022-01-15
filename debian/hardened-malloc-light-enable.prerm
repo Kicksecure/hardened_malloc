@@ -20,17 +20,17 @@ true "
 
 if [ "$1" = "purge" ] || [ "$1" = "remove" ]; then
    if test -r /etc/ld.so.preload ; then
-      if grep -q /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so /etc/ld.so.preload ; then
-         if LANG=C str_replace /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so "" /etc/ld.so.preload >/dev/null ; then
-            echo "INFO: $0: Removed /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so from /etc/ld.so.preload, OK."
+      if grep -q /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so /etc/ld.so.preload ; then
+         if LANG=C str_replace /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so "" /etc/ld.so.preload >/dev/null ; then
+            echo "INFO: $0: Removed /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so from /etc/ld.so.preload, OK."
          else
-            echo "ERROR: $0: Removal of /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so from /etc/ld.so.preload failed." >&2
+            echo "ERROR: $0: Removal of /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so from /etc/ld.so.preload failed." >&2
          fi
       else
-         echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so was already removed from /etc/ld.so.preload, OK."
+         echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so was already removed from /etc/ld.so.preload, OK."
       fi
    else
-      echo "INFO: $0: /etc/ld.so.preload does not exist, therefore no need to remove /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so, OK."
+      echo "INFO: $0: /etc/ld.so.preload does not exist, therefore no need to remove /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so, OK."
    fi
 
    rm -f /var/lib/hardened-malloc-kicksecure-enable/enabled
