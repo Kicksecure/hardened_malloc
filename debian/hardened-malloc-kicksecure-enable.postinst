@@ -23,6 +23,14 @@ create_hardened_malloc_kicksecure_enabled_status_file() {
    touch /var/lib/hardened-malloc-kicksecure-enable/enabled
 }
 
+## legacy
+if test -f /etc/ld.so.preload ; then
+   search="/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so"
+   replace="/usr/lib/libhardened_malloc.so/libhardened_malloc-light.so"
+   file_name="/etc/ld.so.preload"
+   LANG=C str_replace "$search" "$replace" "$file_name" || true
+fi
+
 if test -r /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so ; then
    if grep -q /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so /etc/ld.so.preload ; then
       echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so already enabled in /etc/ld.so.preload, OK."
