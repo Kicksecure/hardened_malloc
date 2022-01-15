@@ -1,3 +1,15 @@
+commit 0b8d0c02031b3283f6f30896d92452faa294b973
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 08:02:55 2022 -0500
+
+    package build fix for upstream version 10
+
+commit ac7538937149f3590a71eafc5ca81dd545eb89eb
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Jan 14 11:23:49 2022 -0500
+
+    bumped changelog version
+
 commit b9d66ce4dd654e079b0d5d00a3e6bc5a6102751d
 Merge: becde94 17891d7
 Author: Patrick Schleizer <adrelanos@whonix.org>
