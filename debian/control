@@ -31,26 +31,24 @@ Description: security-focused general purpose memory allocator
  Ships two files:
  .
   * [1] /usr/lib/libhardened_malloc.so/libhardened_malloc.so
-  * [2] /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so
+  * [2] /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so
  .
- [1] Is was compiled with Hardened Malloc compilation parameters.
+ [1] Was compiled with Hardened Malloc Default compilation parameters.
  .
- [2] Uses a modified configuration that aims to be suitable to be enabled by
- default in Whonix and Kicksecure. It is a lightweight fork of Hardened
- Malloc by Kicksecure developers with no other changes than compilation
- parameters.
+ [2] Was compiled with Hardened Malloc Light compilation parameters.
 
-Package: hardened-malloc-kicksecure-enable
+Package: hardened-malloc-light-enable
 ## Actually is 'Architecture: all' but genmkfile cannot handle that a package
 ## being a mix of 'Architecture: any' and 'Architecture: all' yet.
 Architecture: amd64
 Depends: hardened-malloc, helper-scripts, ${shlibs:Depends}, ${misc:Depends}
-Description: enables Hardened Malloc Kicksecure
- Adds /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so to
+Replaces: hardened-malloc-kicksecure-enable
+Description: enables Hardened Malloc Light
+ Adds /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so to
  /etc/ld.so.preload systemd wide configuration file.
  .
  Does this only once per installation. The user is free to undo changes to
  /etc/ld.so.preload. Once this package is purged and re-installed it will
- re-enable the lightweight fork of Hardened Malloc by Kicksecure developers.
+ re-enable the Hardened Malloc Light.
  .
  Other than doing that this is an empty package.
