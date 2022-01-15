@@ -61,7 +61,10 @@ Package: hardened-malloc-kicksecure-enable
 Architecture: amd64
 Depends: hardened-malloc-light-enable | dummy-dependency-hardened-malloc,
  ${shlibs:Depends}, ${misc:Depends}
-Description: replaced by hardened-malloc-light-enable
- Legacy. Safe to remove.
+Section: oldlibs
+Description: transitional package
+ This is a transitional package. It can safely be removed.
+ .
+ Legacy.
  .
  Other than doing that this is an empty package.
