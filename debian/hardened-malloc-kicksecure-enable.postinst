@@ -23,22 +23,22 @@ create_hardened_malloc_kicksecure_enabled_status_file() {
    touch /var/lib/hardened-malloc-kicksecure-enable/enabled
 }
 
-if test -r /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so ; then
-   if grep -q /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so /etc/ld.so.preload ; then
-      echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so already enabled in /etc/ld.so.preload, OK."
+if test -r /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so ; then
+   if grep -q /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so /etc/ld.so.preload ; then
+      echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so already enabled in /etc/ld.so.preload, OK."
       create_hardened_malloc_kicksecure_enabled_status_file
    else
       if test -f /var/lib/hardened-malloc-kicksecure-enable/enabled ; then
-         echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so was already previously enabled by this package, but currently is disabled. Leaving it as is, OK."
-      elif echo "/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so" | tee "/etc/ld.so.preload" >/dev/null ; then
-         echo "INFO: $0: enabled /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so in /etc/ld.so.preload, OK."
+         echo "INFO: $0: /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so was already previously enabled by this package, but currently is disabled. Leaving it as is, OK."
+      elif echo "/usr/lib/libhardened_malloc.so/libhardened_malloc-light.so" | tee "/etc/ld.so.preload" >/dev/null ; then
+         echo "INFO: $0: enabled /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so in /etc/ld.so.preload, OK."
          create_hardened_malloc_kicksecure_enabled_status_file
       else
-         echo "ERROR: $0: could not write /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so to /etc/ld.so.preload." >&2
+         echo "ERROR: $0: could not write /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so to /etc/ld.so.preload." >&2
       fi
    fi
 else
-   echo "ERROR: $0: file /usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so does not exist." >&2
+   echo "ERROR: $0: file /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so does not exist." >&2
 fi
 
 true "INFO: debhelper beginning here."
