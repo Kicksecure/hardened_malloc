@@ -190,19 +190,23 @@ struct size_info {
 };
 
 static inline struct size_info get_size_info(size_t size) {
-    if (size == 0) {
+    if (unlikely(size == 0)) {
         return (struct size_info){0, 0};
     }
+    // size <= 64 is needed for correctness and raising it to size <= 128 is an optimization
     if (size <= 128) {
-        return (struct size_info){(size + 15) & ~15, ((size - 1) >> 4) + 1};
+        return (struct size_info){align(size, 16), ((size - 1) >> 4) + 1};
     }
-    for (unsigned class = 9; class < N_SIZE_CLASSES; class++) {
-        size_t real_size = size_classes[class];
-        if (size <= real_size) {
-            return (struct size_info){real_size, class};
-        }
-    }
-    fatal_error("invalid size for slabs");
+
+    static const size_t initial_spacing_multiplier = 5;
+    static const size_t special_small_sizes = 5; // 0, 16, 32, 48, 64
+
+    size_t spacing_class_shift = log2u64(size - 1) - 2;
+    size_t spacing_class = 1ULL << spacing_class_shift;
+    size_t real_size = align(size, spacing_class);
+    size_t spacing_class_index = (real_size >> spacing_class_shift) - initial_spacing_multiplier;
+    size_t index = (spacing_class_shift - 4) * 4 + special_small_sizes + spacing_class_index;
+    return (struct size_info){real_size, index};
 }
 
 // alignment must be a power of 2 <= PAGE_SIZE since slabs are only page aligned
@@ -217,7 +221,7 @@ static inline struct size_info get_size_info_align(size_t size, size_t alignment
 }
 
 static size_t get_slab_size(size_t slots, size_t size) {
-    return PAGE_CEILING(slots * size);
+    return page_align(slots * size);
 }
 
 struct __attribute__((aligned(CACHELINE_SIZE))) size_class {
@@ -288,7 +292,7 @@ static size_t get_metadata_max(size_t slab_size) {
 static struct slab_metadata *alloc_metadata(struct size_class *c, size_t slab_size, bool non_zero_size) {
     if (unlikely(c->metadata_count >= c->metadata_allocated)) {
         size_t metadata_max = get_metadata_max(slab_size);
-        if (c->metadata_count >= metadata_max) {
+        if (unlikely(c->metadata_count >= metadata_max)) {
             errno = ENOMEM;
             return NULL;
         }
@@ -296,7 +300,7 @@ static struct slab_metadata *alloc_metadata(struct size_class *c, size_t slab_si
         if (allocate > metadata_max) {
             allocate = metadata_max;
         }
-        if (memory_protect_rw_metadata(c->slab_info, allocate * sizeof(struct slab_metadata))) {
+        if (unlikely(memory_protect_rw_metadata(c->slab_info, allocate * sizeof(struct slab_metadata)))) {
             return NULL;
         }
         c->metadata_allocated = allocate;
@@ -317,78 +321,78 @@ static struct slab_metadata *alloc_metadata(struct size_class *c, size_t slab_si
 }
 
 static void set_used_slot(struct slab_metadata *metadata, size_t index) {
-    size_t bucket = index / 64;
-    metadata->bitmap[bucket] |= 1UL << (index - bucket * 64);
+    size_t bucket = index / U64_WIDTH;
+    metadata->bitmap[bucket] |= 1UL << (index - bucket * U64_WIDTH);
 #ifdef SLAB_METADATA_COUNT
     metadata->count++;
 #endif
 }
 
 static void clear_used_slot(struct slab_metadata *metadata, size_t index) {
-    size_t bucket = index / 64;
-    metadata->bitmap[bucket] &= ~(1UL << (index - bucket * 64));
+    size_t bucket = index / U64_WIDTH;
+    metadata->bitmap[bucket] &= ~(1UL << (index - bucket * U64_WIDTH));
 #ifdef SLAB_METADATA_COUNT
     metadata->count--;
 #endif
 }
 
 static bool is_used_slot(const struct slab_metadata *metadata, size_t index) {
-    size_t bucket = index / 64;
-    return (metadata->bitmap[bucket] >> (index - bucket * 64)) & 1UL;
+    size_t bucket = index / U64_WIDTH;
+    return (metadata->bitmap[bucket] >> (index - bucket * U64_WIDTH)) & 1UL;
 }
 
 #if SLAB_QUARANTINE
 static void set_quarantine_slot(struct slab_metadata *metadata, size_t index) {
-    size_t bucket = index / 64;
-    metadata->quarantine_bitmap[bucket] |= 1UL << (index - bucket * 64);
+    size_t bucket = index / U64_WIDTH;
+    metadata->quarantine_bitmap[bucket] |= 1UL << (index - bucket * U64_WIDTH);
 }
 
 static void clear_quarantine_slot(struct slab_metadata *metadata, size_t index) {
-    size_t bucket = index / 64;
-    metadata->quarantine_bitmap[bucket] &= ~(1UL << (index - bucket * 64));
+    size_t bucket = index / U64_WIDTH;
+    metadata->quarantine_bitmap[bucket] &= ~(1UL << (index - bucket * U64_WIDTH));
 }
 
 static bool is_quarantine_slot(const struct slab_metadata *metadata, size_t index) {
-    size_t bucket = index / 64;
-    return (metadata->quarantine_bitmap[bucket] >> (index - bucket * 64)) & 1UL;
+    size_t bucket = index / U64_WIDTH;
+    return (metadata->quarantine_bitmap[bucket] >> (index - bucket * U64_WIDTH)) & 1UL;
 }
 #endif
 
 static u64 get_mask(size_t slots) {
-    return slots < 64 ? ~0UL << slots : 0;
+    return slots < U64_WIDTH ? ~0UL << slots : 0;
 }
 
 static size_t get_free_slot(struct random_state *rng, size_t slots, const struct slab_metadata *metadata) {
     if (SLOT_RANDOMIZE) {
         // randomize start location for linear search (uniform random choice is too slow)
         size_t random_index = get_random_u16_uniform(rng, slots);
-        size_t first_bitmap = random_index / 64;
-        u64 random_split = ~(~0UL << (random_index - first_bitmap * 64));
+        size_t first_bitmap = random_index / U64_WIDTH;
+        u64 random_split = ~(~0UL << (random_index - first_bitmap * U64_WIDTH));
 
         size_t i = first_bitmap;
         u64 masked = metadata->bitmap[i];
         masked |= random_split;
         for (;;) {
-            if (i == slots / 64) {
-                masked |= get_mask(slots - i * 64);
+            if (i == slots / U64_WIDTH) {
+                masked |= get_mask(slots - i * U64_WIDTH);
             }
 
             if (masked != ~0UL) {
-                return ffzl(masked) - 1 + i * 64;
+                return ffz64(masked) - 1 + i * U64_WIDTH;
             }
 
-            i = i == (slots - 1) / 64 ? 0 : i + 1;
+            i = i == (slots - 1) / U64_WIDTH ? 0 : i + 1;
             masked = metadata->bitmap[i];
         }
     } else {
-        for (size_t i = 0; i <= (slots - 1) / 64; i++) {
+        for (size_t i = 0; i <= (slots - 1) / U64_WIDTH; i++) {
             u64 masked = metadata->bitmap[i];
-            if (i == (slots - 1) / 64) {
-                masked |= get_mask(slots - i * 64);
+            if (i == (slots - 1) / U64_WIDTH) {
+                masked |= get_mask(slots - i * U64_WIDTH);
             }
 
             if (masked != ~0UL) {
-                return ffzl(masked) - 1 + i * 64;
+                return ffz64(masked) - 1 + i * U64_WIDTH;
             }
         }
     }
@@ -400,19 +404,19 @@ static bool has_free_slots(size_t slots, const struct slab_metadata *metadata) {
 #ifdef SLAB_METADATA_COUNT
     return metadata->count < slots;
 #else
-    if (slots <= 64) {
+    if (slots <= U64_WIDTH) {
         u64 masked = metadata->bitmap[0] | get_mask(slots);
         return masked != ~0UL;
     }
-    if (slots <= 128) {
-        u64 masked = metadata->bitmap[1] | get_mask(slots - 64);
+    if (slots <= U64_WIDTH * 2) {
+        u64 masked = metadata->bitmap[1] | get_mask(slots - U64_WIDTH);
         return metadata->bitmap[0] != ~0UL || masked != ~0UL;
     }
-    if (slots <= 192) {
-        u64 masked = metadata->bitmap[2] | get_mask(slots - 128);
+    if (slots <= U64_WIDTH * 3) {
+        u64 masked = metadata->bitmap[2] | get_mask(slots - U64_WIDTH * 2);
         return metadata->bitmap[0] != ~0UL || metadata->bitmap[1] != ~0UL || masked != ~0UL;
     }
-    u64 masked = metadata->bitmap[3] | get_mask(slots - 192);
+    u64 masked = metadata->bitmap[3] | get_mask(slots - U64_WIDTH * 3);
     return metadata->bitmap[0] != ~0UL || metadata->bitmap[1] != ~0UL || metadata->bitmap[2] != ~0UL || masked != ~0UL;
 #endif
 }
@@ -430,7 +434,7 @@ static struct slab_metadata *get_metadata(const struct size_class *c, const void
     size_t offset = (const char *)p - (const char *)c->class_region_start;
     size_t index = libdivide_u64_do(offset, &c->slab_size_divisor);
     // still caught without this check either as a read access violation or "double free"
-    if (index >= c->metadata_allocated) {
+    if (unlikely(index >= c->metadata_allocated)) {
         fatal_error("invalid free within a slab yet to be used");
     }
     return c->slab_info + index;
@@ -446,7 +450,7 @@ static void write_after_free_check(const char *p, size_t size) {
     }
 
     for (size_t i = 0; i < size; i += sizeof(u64)) {
-        if (*(const u64 *)(const void *)(p + i)) {
+        if (unlikely(*(const u64 *)(const void *)(p + i))) {
             fatal_error("detected write after free");
         }
     }
@@ -506,7 +510,7 @@ static inline void stats_slab_deallocate(UNUSED struct size_class *c, UNUSED siz
 
 static inline void *allocate_small(unsigned arena, size_t requested_size) {
     struct size_info info = get_size_info(requested_size);
-    size_t size = info.size ? info.size : 16;
+    size_t size = likely(info.size) ? info.size : 16;
 
     struct size_class *c = &ro.size_class_metadata[arena][info.class];
     size_t slots = get_slots(info.class);
@@ -662,11 +666,11 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
 
     struct size_class *c = &ro.size_class_metadata[size_class_info.arena][class];
     size_t size = size_classes[class];
-    if (expected_size && size != *expected_size) {
+    if (expected_size && unlikely(size != *expected_size)) {
         fatal_error("sized deallocation mismatch (small)");
     }
     bool is_zero_size = size == 0;
-    if (is_zero_size) {
+    if (unlikely(is_zero_size)) {
         size = 16;
     }
     size_t slots = get_slots(class);
@@ -680,15 +684,15 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
     void *slab = get_slab(c, slab_size, metadata);
     size_t slot = libdivide_u32_do((char *)p - (char *)slab, &c->size_divisor);
 
-    if (slot_pointer(size, slab, slot) != p) {
+    if (unlikely(slot_pointer(size, slab, slot) != p)) {
         fatal_error("invalid unaligned free");
     }
 
-    if (!is_used_slot(metadata, slot)) {
+    if (unlikely(!is_used_slot(metadata, slot))) {
         fatal_error("double free");
     }
 
-    if (!is_zero_size) {
+    if (likely(!is_zero_size)) {
         check_canary(metadata, p, size);
 
         if (ZERO_ON_FREE) {
@@ -697,13 +701,13 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
     }
 
 #if SLAB_QUARANTINE
-    if (is_quarantine_slot(metadata, slot)) {
+    if (unlikely(is_quarantine_slot(metadata, slot))) {
         fatal_error("double free (quarantine)");
     }
 
     set_quarantine_slot(metadata, slot);
 
-    size_t quarantine_shift = __builtin_clzl(size) - (63 - MAX_SLAB_SIZE_CLASS_SHIFT);
+    size_t quarantine_shift = clz64(size) - (63 - MAX_SLAB_SIZE_CLASS_SHIFT);
 
 #if SLAB_QUARANTINE_RANDOM_LENGTH > 0
     size_t slab_quarantine_random_length = SLAB_QUARANTINE_RANDOM_LENGTH << quarantine_shift;
@@ -1064,7 +1068,7 @@ static inline bool is_init(void) {
 }
 
 static inline void enforce_init(void) {
-    if (!is_init()) {
+    if (unlikely(!is_init())) {
         fatal_error("invalid uninitialized allocator usage");
     }
 }
@@ -1074,7 +1078,7 @@ COLD static void init_slow_path(void) {
 
     mutex_lock(&lock);
 
-    if (is_init()) {
+    if (unlikely(is_init())) {
         mutex_unlock(&lock);
         return;
     }
@@ -1083,12 +1087,12 @@ COLD static void init_slow_path(void) {
     ro.metadata_pkey = pkey_alloc(0, 0);
 #endif
 
-    if (sysconf(_SC_PAGESIZE) != PAGE_SIZE) {
+    if (unlikely(sysconf(_SC_PAGESIZE) != PAGE_SIZE)) {
         fatal_error("runtime page size does not match compile-time page size which is not supported");
     }
 
     struct random_state *rng = allocate_pages(sizeof(struct random_state), PAGE_SIZE, true, "malloc init rng");
-    if (rng == NULL) {
+    if (unlikely(rng == NULL)) {
         fatal_error("failed to allocate init rng");
     }
     random_state_init(rng);
@@ -1098,10 +1102,10 @@ COLD static void init_slow_path(void) {
 
     struct allocator_state *allocator_state =
         allocate_pages(sizeof(struct allocator_state), metadata_guard_size, false, "malloc allocator_state");
-    if (allocator_state == NULL) {
+    if (unlikely(allocator_state == NULL)) {
         fatal_error("failed to reserve allocator state");
     }
-    if (memory_protect_rw_metadata(allocator_state, offsetof(struct allocator_state, regions_a))) {
+    if (unlikely(memory_protect_rw_metadata(allocator_state, offsetof(struct allocator_state, regions_a)))) {
         fatal_error("failed to unprotect allocator state");
     }
 
@@ -1115,12 +1119,12 @@ COLD static void init_slow_path(void) {
     ra->regions = ro.regions[0];
     ra->total = INITIAL_REGION_TABLE_SIZE;
     ra->free = INITIAL_REGION_TABLE_SIZE;
-    if (memory_protect_rw_metadata(ra->regions, ra->total * sizeof(struct region_metadata))) {
+    if (unlikely(memory_protect_rw_metadata(ra->regions, ra->total * sizeof(struct region_metadata)))) {
         fatal_error("failed to unprotect memory for regions table");
     }
 
     ro.slab_region_start = memory_map(slab_region_size);
-    if (ro.slab_region_start == NULL) {
+    if (unlikely(ro.slab_region_start == NULL)) {
         fatal_error("failed to allocate slab region");
     }
     void *slab_region_end = (char *)ro.slab_region_start + slab_region_size;
@@ -1154,7 +1158,7 @@ COLD static void init_slow_path(void) {
 
     atomic_store_explicit(&ro.slab_region_end, slab_region_end, memory_order_release);
 
-    if (memory_protect_ro(&ro, sizeof(ro))) {
+    if (unlikely(memory_protect_ro(&ro, sizeof(ro)))) {
         fatal_error("failed to protect allocator data");
     }
     memory_set_name(&ro, sizeof(ro), "malloc read-only after init");
@@ -1162,7 +1166,7 @@ COLD static void init_slow_path(void) {
     mutex_unlock(&lock);
 
     // may allocate, so wait until the allocator is initialized to avoid deadlocking
-    if (pthread_atfork(full_lock, full_unlock, post_fork_child)) {
+    if (unlikely(pthread_atfork(full_lock, full_unlock, post_fork_child))) {
         fatal_error("pthread_atfork failed");
     }
 }
@@ -1199,12 +1203,9 @@ static size_t get_large_size_class(size_t size) {
         // 512 KiB [2560 KiB, 3 MiB, 3584 KiB, 4 MiB]
         // 1 MiB [5 MiB, 6 MiB, 7 MiB, 8 MiB]
         // etc.
-        size = max(size, (size_t)PAGE_SIZE);
-        size_t spacing_shift = 64 - __builtin_clzl(size - 1) - 3;
-        size_t spacing_class = 1ULL << spacing_shift;
-        return (size + (spacing_class - 1)) & ~(spacing_class - 1);
+        return get_size_info(max(size, (size_t)PAGE_SIZE)).size;
     }
-    return PAGE_CEILING(size);
+    return page_align(size);
 }
 
 static size_t get_guard_size(struct random_state *state, size_t size) {
@@ -1230,7 +1231,7 @@ static void *allocate_large(size_t size) {
     }
 
     mutex_lock(&ra->lock);
-    if (regions_insert(p, size, guard_size)) {
+    if (unlikely(regions_insert(p, size, guard_size))) {
         mutex_unlock(&ra->lock);
         deallocate_pages(p, size, guard_size);
         return NULL;
@@ -1253,11 +1254,11 @@ static void deallocate_large(void *p, const size_t *expected_size) {
 
     mutex_lock(&ra->lock);
     const struct region_metadata *region = regions_find(p);
-    if (region == NULL) {
+    if (unlikely(region == NULL)) {
         fatal_error("invalid free");
     }
     size_t size = region->size;
-    if (expected_size && size != get_large_size_class(*expected_size)) {
+    if (expected_size && unlikely(size != get_large_size_class(*expected_size))) {
         fatal_error("sized deallocation mismatch (large)");
     }
     size_t guard_size = region->guard_size;
@@ -1279,7 +1280,7 @@ static int allocate_aligned(unsigned arena, void **memptr, size_t alignment, siz
         }
 
         void *p = allocate(arena, size);
-        if (p == NULL) {
+        if (unlikely(p == NULL)) {
             return ENOMEM;
         }
         *memptr = p;
@@ -1298,12 +1299,12 @@ static int allocate_aligned(unsigned arena, void **memptr, size_t alignment, siz
     mutex_unlock(&ra->lock);
 
     void *p = allocate_pages_aligned(size, alignment, guard_size, "malloc large");
-    if (p == NULL) {
+    if (unlikely(p == NULL)) {
         return ENOMEM;
     }
 
     mutex_lock(&ra->lock);
-    if (regions_insert(p, size, guard_size)) {
+    if (unlikely(regions_insert(p, size, guard_size))) {
         mutex_unlock(&ra->lock);
         deallocate_pages(p, size, guard_size);
         return ENOMEM;
@@ -1396,7 +1397,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
 
         mutex_lock(&ra->lock);
         const struct region_metadata *region = regions_find(old);
-        if (region == NULL) {
+        if (unlikely(region == NULL)) {
             fatal_error("invalid realloc");
         }
         old_size = region->size;
@@ -1422,7 +1423,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
 
                 mutex_lock(&ra->lock);
                 struct region_metadata *region = regions_find(old);
-                if (region == NULL) {
+                if (unlikely(region == NULL)) {
                     fatal_error("invalid realloc");
                 }
                 region->size = size;
@@ -1468,7 +1469,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
 
                 mutex_lock(&ra->lock);
                 struct region_metadata *region = regions_find(old);
-                if (region == NULL) {
+                if (unlikely(region == NULL)) {
                     fatal_error("invalid realloc");
                 }
                 regions_delete(region);
@@ -1480,7 +1481,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
                     deallocate_pages(old, old_size, old_guard_size);
                 } else {
                     memory_unmap((char *)old - old_guard_size, old_guard_size);
-                    memory_unmap((char *)old + PAGE_CEILING(old_size), old_guard_size);
+                    memory_unmap((char *)old + page_align(old_size), old_guard_size);
                 }
                 thread_seal_metadata();
                 return new;
@@ -1524,7 +1525,7 @@ EXPORT void *h_valloc(size_t size) {
 }
 
 EXPORT void *h_pvalloc(size_t size) {
-    size = PAGE_CEILING(size);
+    size = page_align(size);
     if (unlikely(!size)) {
         errno = ENOMEM;
         return NULL;
@@ -1580,7 +1581,7 @@ static inline void memory_corruption_check_small(const void *p) {
     struct size_class *c = &ro.size_class_metadata[size_class_info.arena][class];
     size_t size = size_classes[class];
     bool is_zero_size = size == 0;
-    if (is_zero_size) {
+    if (unlikely(is_zero_size)) {
         size = 16;
     }
     size_t slab_size = get_slab_size(get_slots(class), size);
@@ -1591,20 +1592,20 @@ static inline void memory_corruption_check_small(const void *p) {
     void *slab = get_slab(c, slab_size, metadata);
     size_t slot = libdivide_u32_do((const char *)p - (const char *)slab, &c->size_divisor);
 
-    if (slot_pointer(size, slab, slot) != p) {
+    if (unlikely(slot_pointer(size, slab, slot) != p)) {
         fatal_error("invalid unaligned malloc_usable_size");
     }
 
-    if (!is_used_slot(metadata, slot)) {
+    if (unlikely(!is_used_slot(metadata, slot))) {
         fatal_error("invalid malloc_usable_size");
     }
 
-    if (!is_zero_size) {
+    if (likely(!is_zero_size)) {
         check_canary(metadata, p, size);
     }
 
 #if SLAB_QUARANTINE
-    if (is_quarantine_slot(metadata, slot)) {
+    if (unlikely(is_quarantine_slot(metadata, slot))) {
         fatal_error("invalid malloc_usable_size (quarantine)");
     }
 #endif
@@ -1632,7 +1633,7 @@ EXPORT size_t h_malloc_usable_size(H_MALLOC_USABLE_SIZE_CONST void *p) {
     struct region_allocator *ra = ro.region_allocator;
     mutex_lock(&ra->lock);
     const struct region_metadata *region = regions_find(p);
-    if (region == NULL) {
+    if (unlikely(region == NULL)) {
         fatal_error("invalid malloc_usable_size");
     }
     size_t size = region->size;
@@ -1663,12 +1664,12 @@ EXPORT size_t h_malloc_object_size(const void *p) {
         void *slab = get_slab(c, slab_size, metadata);
         size_t slot = libdivide_u32_do((const char *)p - (const char *)slab, &c->size_divisor);
 
-        if (!is_used_slot(metadata, slot)) {
+        if (unlikely(!is_used_slot(metadata, slot))) {
             fatal_error("invalid malloc_object_size");
         }
 
 #if SLAB_QUARANTINE
-        if (is_quarantine_slot(metadata, slot)) {
+        if (unlikely(is_quarantine_slot(metadata, slot))) {
             fatal_error("invalid malloc_object_size (quarantine)");
         }
 #endif
@@ -1766,7 +1767,7 @@ EXPORT int h_malloc_trim(UNUSED size_t pad) {
 
 #if SLAB_QUARANTINE && CONFIG_EXTENDED_SIZE_CLASSES
             if (size >= min_extended_size_class) {
-                size_t quarantine_shift = __builtin_clzl(size) - (63 - MAX_SLAB_SIZE_CLASS_SHIFT);
+                size_t quarantine_shift = clz64(size) - (63 - MAX_SLAB_SIZE_CLASS_SHIFT);
 
 #if SLAB_QUARANTINE_RANDOM_LENGTH > 0
                 size_t slab_quarantine_random_length = SLAB_QUARANTINE_RANDOM_LENGTH << quarantine_shift;
@@ -1822,7 +1823,7 @@ EXPORT struct mallinfo2 h_mallinfo2(void) {
 #endif
 
 #if CONFIG_STATS
-    if (!is_init()) {
+    if (unlikely(!is_init())) {
         return info;
     }
 
@@ -1865,7 +1866,7 @@ EXPORT int h_malloc_info(int options, UNUSED FILE *fp) {
     fputs("<malloc version=\"hardened_malloc-1\">", fp);
 
 #if CONFIG_STATS
-    if (is_init()) {
+    if (likely(is_init())) {
         thread_unseal_metadata();
 
         for (unsigned arena = 0; arena < N_ARENA; arena++) {
@@ -1934,7 +1935,7 @@ EXPORT struct mallinfo h_mallinfo_arena_info(UNUSED size_t arena) {
     struct mallinfo info = {0};
 
 #if CONFIG_STATS
-    if (!is_init()) {
+    if (unlikely(!is_init())) {
         return info;
     }
 
@@ -1974,7 +1975,7 @@ EXPORT struct mallinfo h_mallinfo_bin_info(UNUSED size_t arena, UNUSED size_t bi
     struct mallinfo info = {0};
 
 #if CONFIG_STATS
-    if (!is_init()) {
+    if (unlikely(!is_init())) {
         return info;
     }
 

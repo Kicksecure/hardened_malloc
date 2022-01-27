@@ -1,6 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 // C11 noreturn doesn't work in C++
@@ -28,17 +29,34 @@
 #define STRINGIFY(s) #s
 #define ALIAS(f) __attribute__((alias(STRINGIFY(f))))
 
-static inline int ffzl(unsigned long x) {
-    return __builtin_ffsl(~x);
-}
-
-COLD noreturn void fatal_error(const char *s);
-
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 typedef unsigned __int128 u128;
+
+#define U64_WIDTH 64
+
+static inline int ffz64(u64 x) {
+    return __builtin_ffsll(~x);
+}
+
+// parameter must not be 0
+static inline int clz64(u64 x) {
+    return __builtin_clzll(x);
+}
+
+// parameter must not be 0
+static inline u64 log2u64(u64 x) {
+    return U64_WIDTH - clz64(x) - 1;
+}
+
+static inline size_t align(size_t size, size_t align) {
+    size_t mask = align - 1;
+    return (size + mask) & ~mask;
+}
+
+COLD noreturn void fatal_error(const char *s);
 
 #if CONFIG_SEAL_METADATA
 

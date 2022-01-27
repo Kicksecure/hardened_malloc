@@ -10,7 +10,6 @@ common_cflags = [
     "-Wcast-align",
     "-Wcast-qual",
     "-Wwrite-strings",
-    "-Wno-constant-logical-operand",
     "-Werror",
     "-DH_MALLOC_PREFIX",
     "-DZERO_ON_FREE=true",
@@ -43,7 +42,7 @@ cc_defaults {
             cflags: ["-DCONFIG_CLASS_REGION_SIZE=34359738368"] // 32GiB
         },
     },
-    conlyflags: ["-std=c11", "-Wmissing-prototypes"],
+    conlyflags: ["-std=c17", "-Wmissing-prototypes"],
     stl: "none",
 }
 
