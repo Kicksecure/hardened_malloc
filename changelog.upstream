@@ -1,3 +1,154 @@
+commit f5fb1e1532979fb0f1519a00be341fe8771cd802
+Merge: 7ebd960 995ce07
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Jan 27 07:53:11 2022 -0500
+
+    Merge tag '11'
+    
+    11
+
+commit 995ce07d4559460b1060991ada7bca1482e4271b
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 19:46:49 2022 -0500
+
+    add is_init likely/unlikely markers
+
+commit c9d1abcd7e1cccd65026fab89206306bbb4d1d3d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 19:41:53 2022 -0500
+
+    explicitly mark fatal error conditions unlikely
+
+commit 8f0b252c33dac776c8100859fd888568d900d849
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 19:02:35 2022 -0500
+
+    mark more out-of-memory conditions as unlikely
+
+commit 3cffc1e1af3c7d33d4f71fdc1513d0b71c728ed9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 18:21:38 2022 -0500
+
+    treat zero size malloc as unlikely
+    
+    Calls to malloc with a zero size are extremely rare relative to normal
+    usage of the API. It's generally only done by inefficient C code with
+    open coded dynamic array implementations where they aren't handling zero
+    size as a special case for their usage of malloc/realloc. Efficient code
+    wouldn't be making these allocations. It doesn't make sense to optimize
+    for the performance of rare edge cases caused by inefficient code.
+
+commit ae2524bf8887beace8034a9207bcb5556acbacd9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 16:24:14 2022 -0500
+
+    ignore environment for test Makefile variables
+
+commit e28addda1921eccff4c15fadf16342eb5c332eb6
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 15:07:13 2022 -0500
+
+    add back gitignore entries
+
+commit 9d89712386c8a963fcaca1125c819483dd2035db
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 15:06:29 2022 -0500
+
+    remove extra newline
+
+commit 84eadd8568c95698000338c7ec7cd38ff006f59b
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Fri Jan 21 20:47:21 2022 +0100
+
+    Move memory corruption tests up a directory
+
+commit 0bbcc5d61040c474d6ef14f011ce0b39ef45777e
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Jan 19 16:42:12 2022 -0500
+
+    malloc.c was renamed to h_malloc.c
+
+commit 3fa30842ed6a1d4867a18afbd0c6f049d502c1cc
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Mon Jan 17 22:16:45 2022 +0100
+
+    Use $(MAKE) instead of make in Makefiles
+    
+    This will pass the correct flags to the make
+    invocations.
+
+commit b3d78bd5f6d8232655f1f824da7453d3e7f53fbb
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 21:02:17 2022 -0500
+
+    use static const for local constants
+
+commit 8d61e632746395fe892f1d7ad2f02428f6d8726e
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 20:50:49 2022 -0500
+
+    add comment about special small size classes
+
+commit 422ee78b3eb6066790a87166a899b0f18e7dc1d9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 16:57:22 2022 -0500
+
+    reorganize pages.h header
+
+commit 3e312695e1e3fe4b2ed405cbb0b1a2844c1a65fe
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 16:28:24 2022 -0500
+
+    document clz64/log2u64 not being able to handle 0
+
+commit 81cf2f27a07439f8a5598f5e8673a76aadfca462
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 14:05:59 2022 -0500
+
+    calculate slab size class instead of array loop
+
+commit d8cb2d9f7a1f132e1c45d6578f3f4d124ec0ebef
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 15:39:59 2022 -0500
+
+    use consistent wrappers around clz/ffs
+
+commit 86f9c739ee88f47c24b7e3c93e94381e88947f6a
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 15:01:51 2022 -0500
+
+    define constant for u64 bit width
+
+commit 536f85253853922095819325ce20adc4fd24e4e8
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 14:41:46 2022 -0500
+
+    reuse a single size alignment implementation
+
+commit e814cf4f5c459d0e1f883085e7d6763d05e1bfa7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 12:18:00 2022 -0500
+
+    enable linking optimization for GNU linker
+
+commit 705211ef496866cd32f5afb5213af7e8beee3d9c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 11:50:55 2022 -0500
+
+    define UBSan flags for SHARED_FLAGS to reuse it
+
+commit 189d3362d5d0cc87f6b9daf3a4c5a9b921883a8c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Sun Jan 16 11:48:01 2022 -0500
+
+    enable sized deallocation ABI for consistency
+
+commit 7ebd9604f39159b81ffb3dc3b260fe7490ed4b66
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sat Jan 15 11:24:06 2022 -0500
+
+    bumped changelog version
+
 commit 6f93aff1ccfb97ace1bf04d6b277aa6eb4d937b9
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sat Jan 15 11:21:00 2022 -0500
@@ -110,6 +261,26 @@ Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Fri Jan 14 11:23:49 2022 -0500
 
     bumped changelog version
+
+commit e2bcf4a35633c7d9d5a7ef4c4a09e57447b0b16d
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Jan 13 14:51:22 2022 -0500
+
+    stop silencing constant logical operand warning
+    
+    This was resolved by 3696f071a4a136edc9d2baea6ab5fbbd33ced371.
+
+commit d470ae56a58fa3c31b519747c4983036ec15d8fa
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Jan 13 14:48:56 2022 -0500
+
+    switch Android build to C17 from C11
+
+commit 42b097f3b04bd791c9d525ee332e44fdb5faec4c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Jan 13 14:25:41 2022 -0500
+
+    CONFIG_SEAL_METADATA is regularly tested now
 
 commit b9d66ce4dd654e079b0d5d00a3e6bc5a6102751d
 Merge: becde94 17891d7
