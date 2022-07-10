@@ -1,3 +1,31 @@
+commit 181110e2787b437c251e1c62e1255a72c8e45ca0
+Merge: e2e9b5d 0b396ec
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 10 06:57:31 2022 -0400
+
+    Merge remote-tracking branch 'github-kicksecure/master'
+
+commit 0b396ec2db8ae1dcbc34b0512a7b66ae5ba20298
+Merge: e2e9b5d fadb607
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Jul 10 06:56:15 2022 -0400
+
+    Merge pull request #2 from raja-grewal/master
+    
+    Raised maximum number of memory-mapped areas
+
+commit fadb60701c2ae835b16499c7fab1388a6649f84d
+Author: Raja Grewal <rg_public@proton.me>
+Date:   Sun Jul 10 08:09:32 2022 +0000
+
+    Raised maximum memory-mapped areas
+
+commit e2e9b5dd1683c5bfd1faeb14f2abd5cdc4c52e1f
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Wed Jun 8 10:38:53 2022 -0400
+
+    bumped changelog version
+
 commit d95a1ad046cf5c3fe55ae9a523463e76d029c438
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Wed Jun 8 09:24:49 2022 -0400
