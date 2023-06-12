@@ -5,6 +5,12 @@
 
 #export DH_VERBOSE=1
 
+## -gdwarf-4 requried because of:
+## dwz: Unknown debugging section .debug_addr causes some builds to fail
+## https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1016936
+export DEB_CFLAGS_MAINT_APPEND += -gdwarf-4
+export DEB_CXXFLAGS_MAINT_APPEND += -gdwarf-4
+
 CC  := clang
 
 %:
