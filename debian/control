@@ -5,7 +5,7 @@ Source: hardened-malloc
 Section: libs
 Priority: optional
 Maintainer: Patrick Schleizer <adrelanos@whonix.org>
-Build-Depends: debhelper (>= 13), debhelper-compat (= 13), dh-exec, clang, llvm-11-dev, clang-tidy
+Build-Depends: debhelper (>= 13), debhelper-compat (= 13), dh-exec, clang, llvm-15-dev, clang-tidy
 Homepage: https://github.com/GrapheneOS/hardened_malloc
 Vcs-Browser: https://github.com/GrapheneOS/hardened_malloc
 Vcs-Git: https://github.com/GrapheneOS/hardened_malloc.git
