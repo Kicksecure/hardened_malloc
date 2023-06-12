@@ -1,3 +1,45 @@
+commit af17570308332d2268ef06766dfdb728b3027c8e
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 17:10:27 2023 +0000
+
+    re-enable tests
+
+commit 108b4da8bf53e5a74f4cc392bd95c17902ff69ea
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 17:09:18 2023 +0000
+
+    fix: compile flag -gdwarf-4 requried because of:
+    dwz: Unknown debugging section .debug_addr causes some builds to fail
+    
+    https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1016936
+    
+    export DEB_CFLAGS_MAINT_APPEND += -gdwarf-4
+    export DEB_CXXFLAGS_MAINT_APPEND += -gdwarf-4
+
+commit 70307d64b351ea6c1a8f92073bc342989c0097c9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 16:57:13 2023 +0000
+
+    remove outdated .travis file
+
+commit 1c2220855a9608f278c24e85abadca53b21f8578
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 16:55:50 2023 +0000
+
+    bookworm
+
+commit 6d640410562ccddfc1262abee7be3ccdd21008ef
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 16:22:29 2023 +0000
+
+    Standards-Version: 4.6.1.0
+
+commit 9ec5a9ec337ef1fd458909f4c1988e11a4a667d6
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jun 12 15:19:21 2023 +0000
+
+    bumped changelog version
+
 commit f3da174423503907e53356b43eeeac64bc4a9b14
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Jun 12 14:51:57 2023 +0000
