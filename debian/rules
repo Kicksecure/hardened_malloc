@@ -19,7 +19,5 @@ override_dh_auto_build:
 
 ## Tests failing inside (cowbuilder) chroot.
 ## https://github.com/GrapheneOS/hardened_malloc/issues/119
-## Test failing on travis CI.
-## https://api.travis-ci.com/v3/job/387405272/log.txt
 override_dh_auto_test:
 	true
