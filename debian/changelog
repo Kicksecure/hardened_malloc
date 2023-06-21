@@ -1,3 +1,9 @@
+hardened-malloc (0:11.1-7) unstable; urgency=medium
+
+  * New upstream version (local package).
+
+ -- Patrick Schleizer <adrelanos@whonix.org>  Wed, 21 Jun 2023 09:18:09 +0000
+
 hardened-malloc (0:11.1-6) unstable; urgency=medium
 
   * New upstream version (local package).
