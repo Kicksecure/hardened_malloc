@@ -1,3 +1,119 @@
+commit f2ea84a719818256870bd63d23622229e40c4c95
+Merge: 8a94c76 903cba5
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 1 10:35:07 2023 -0400
+
+    Merge tag '12'
+    
+    12
+
+commit 903cba5a84952a84ee2d36ed00d7ca1b2d9b8604
+Author: Christian Göttsche <cgzones@googlemail.com>
+Date:   Wed Sep 27 16:33:18 2023 +0200
+
+    test: add regression test for missing init() in realloc()
+
+commit 9cb4e6daf6fb6237611b3e7b18e590add7b9ce95
+Author: Christian Göttsche <cgzones@googlemail.com>
+Date:   Tue Sep 26 17:16:00 2023 +0200
+
+    do not skip init() in realloc()
+    
+    If N_ARENA is greater than 1 `thread_arena` is initially to N_ARENA,
+    which is an invalid index into `ro.size_class_metadata[]`.
+    
+    The actual used arena is computed in init().
+    
+    Ensure init() is called if a new thread is only using realloc() to avoid
+    UB, e.g. pthread_mutex_lock() might crash due the memory not holding an
+    initialized mutex.
+    
+    Affects mesa 23.2.0~rc4.
+    
+    Example back trace using glmark2 (note `arena=4` with the default
+    N_ARENA being 4):
+    
+        Program terminated with signal SIGSEGV, Segmentation fault.
+        #0  ___pthread_mutex_lock (mutex=0x7edff8d3f200) at ./nptl/pthread_mutex_lock.c:80
+                type = <optimized out>
+                __PRETTY_FUNCTION__ = "___pthread_mutex_lock"
+                id = <optimized out>
+        #1  0x00007f0ab62091a6 in mutex_lock (m=0x7edff8d3f200) at ./mutex.h:21
+        No locals.
+        #2  0x00007f0ab620c9b5 in allocate_small (arena=4, requested_size=24) at h_malloc.c:517
+                info = {size = 32, class = 2}
+                size = 32
+                c = 0x7edff8d3f200
+                slots = 128
+                slab_size = 4096
+                metadata = 0x0
+                slot = 0
+                slab = 0x0
+                p = 0x0
+        #3  0x00007f0ab6209809 in allocate (arena=4, size=24) at h_malloc.c:1252
+        No locals.
+        #4  0x00007f0ab6208e26 in realloc (old=0x72b138199120, size=24) at h_malloc.c:1499
+                vma_merging_reliable = false
+                old_size = 16
+                new = 0x0
+                copy_size = 139683981990973
+        #5  0x00007299f919e556 in attach_shader (ctx=0x7299e9ef9000, shProg=0x7370c9277d30, sh=0x7370c9278230) at ../src/mesa/main/shaderapi.c:336
+                n = 1
+        #6  0x00007299f904223e in _mesa_unmarshal_AttachShader (ctx=<optimized out>, cmd=<optimized out>) at src/mapi/glapi/gen/marshal_generated2.c:1539
+                program = <optimized out>
+                shader = <optimized out>
+                cmd_size = 2
+        #7  0x00007299f8f2e3b2 in glthread_unmarshal_batch (job=job@entry=0x7299e9ef9168, gdata=gdata@entry=0x0, thread_index=thread_index@entry=0) at ../src/mesa/main/glthread.c:139
+                cmd = 0x7299e9ef9180
+                batch = 0x7299e9ef9168
+                ctx = 0x7299e9ef9000
+                pos = 0
+                used = 3
+                buffer = 0x7299e9ef9180
+                shared = <optimized out>
+                lock_mutexes = <optimized out>
+                batch_index = <optimized out>
+        #8  0x00007299f8ecc2d9 in util_queue_thread_func (input=input@entry=0x72c1160e5580) at ../src/util/u_queue.c:309
+                job = {job = 0x7299e9ef9168, global_data = 0x0, job_size = 0, fence = 0x7299e9ef9168, execute = <optimized out>, cleanup = <optimized out>}
+                queue = 0x7299e9ef9058
+                thread_index = 0
+        #9  0x00007299f8f1bcbb in impl_thrd_routine (p=<optimized out>) at ../src/c11/impl/threads_posix.c:67
+                pack = {func = 0x7299f8ecc190 <util_queue_thread_func>, arg = 0x72c1160e5580}
+        #10 0x00007f0ab5aa63ec in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:444
+                ret = <optimized out>
+                pd = <optimized out>
+                out = <optimized out>
+                unwind_buf = {cancel_jmp_buf = {{jmp_buf = {139683974242608, 2767510063778797177, -168, 11, 140727286820160, 126005371879424, -4369625917767903623, -2847048016936659335}, mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0,
+                  0x0}, data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+                not_first_call = <optimized out>
+        #11 0x00007f0ab5b26a2c in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+commit 8696431b884f15c0a25d289f2ccacd20ce9b41f4
+Author: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+Date:   Mon Sep 4 17:14:45 2023 +0000
+
+    Bump actions/checkout from 3 to 4
+    
+    Bumps [actions/checkout](https://github.com/actions/checkout) from 3 to 4.
+    - [Release notes](https://github.com/actions/checkout/releases)
+    - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+    - [Commits](https://github.com/actions/checkout/compare/v3...v4)
+    
+    ---
+    updated-dependencies:
+    - dependency-name: actions/checkout
+      dependency-type: direct:production
+      update-type: version-update:semver-major
+    ...
+    
+    Signed-off-by: dependabot[bot] <support@github.com>
+
+commit 8a94c7671ce3059aae627ca6cbfb5decd0ac63bf
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Jul 17 11:44:11 2023 -0400
+
+    bumped changelog version
+
 commit 58a579638e0c19c67ee25bbe04aea39ba4be0a3e
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Jul 17 11:18:03 2023 -0400
@@ -94,6 +210,170 @@ Date:   Mon Jun 12 14:25:51 2023 +0000
 
     removed outdated .travis.yml file
 
+commit 2d302f7d85944bcaa1ce6419a4c51732f76daaa6
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:58:33 2023 -0400
+
+    enable -Wundef
+
+commit d5f9909eca75044c3ef1d3febf6cec7a788a123b
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:58:20 2023 -0400
+
+    add missing include
+
+commit 5e1901e85dac0758b485fb43960bb10ce8818652
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:51:54 2023 -0400
+
+    silence unwanted tidy warning
+
+commit 462c2c5293b834bcbdde1d3a9389202ae6e809ff
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:17:17 2023 -0400
+
+    conditionally include bits/functexcept.h
+
+commit 8f3281ed6a7dd91be18673b1ff15e96a1ab6f421
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:11:07 2023 -0400
+
+    enable strict prototypes warning
+
+commit 7d75acc62ad7efec815b31779f8380128dfb5cde
+Author: Christian Göttsche <cgzones@googlemail.com>
+Date:   Thu Jun 16 19:22:46 2022 +0200
+
+    use strict prototype
+    
+        h_malloc.c:83:21: error: function declaration isn’t a prototype [-Werror=strict-prototypes]
+           83 | static inline void *get_slab_region_end() {
+              |                     ^~~~~~~~~~~~~~~~~~~
+
+commit af866a7faa79c47baafea829bbd1ccb69288e909
+Author: Christian Göttsche <cgzones@googlemail.com>
+Date:   Thu Jun 16 19:15:02 2022 +0200
+
+    support versioned Clang
+    
+        make CC=clang-14
+        clang-14  -std=c17 -O3 -flto -fPIC -fvisibility=hidden -fno-plt -fstack-clash-protection -fstack-protector-strong -pipe -Wall -Wcast-qual -Wextra -Wfloat-equal -Wformat=2 -Winit-self -Wmissing-format-attribute -Wmissing-noreturn -Wmissing-prototypes -Wnull-dereference -Wpointer-arith -Wshadow -Wstrict-prototypes -Wundef -Wunused -Wwrite-strings -Wcast-align=strict -Wcast-qual -Wwrite-strings -Werror -march=native -Wmissing-prototypes  -D_GNU_SOURCE -I include -DCONFIG_SEAL_METADATA=false -DZERO_ON_FREE=true -DWRITE_AFTER_FREE_CHECK=true -DSLOT_RANDOMIZE=true -DSLAB_CANARY=true -DSLAB_QUARANTINE_RANDOM_LENGTH=1 -DSLAB_QUARANTINE_QUEUE_LENGTH=1 -DCONFIG_EXTENDED_SIZE_CLASSES=true -DCONFIG_LARGE_SIZE_CLASSES=true -DGUARD_SLABS_INTERVAL=1 -DGUARD_SIZE_DIVISOR=2 -DREGION_QUARANTINE_RANDOM_LENGTH=256 -DREGION_QUARANTINE_QUEUE_LENGTH=1024 -DREGION_QUARANTINE_SKIP_THRESHOLD=33554432  -DFREE_SLABS_QUARANTINE_RANDOM_LENGTH=32 -DCONFIG_CLASS_REGION_SIZE=34359738368  -DN_ARENA=4 -DCONFIG_STATS=false  -c -o out/chacha.o chacha.c
+        error: unknown warning option '-Wcast-align=strict'; did you mean '-Wcast-align'? [-Werror,-Wunknown-warning-option]
+        make: *** [Makefile:114: out/chacha.o] Error 1
+
+commit 64dad0a69f2bb113e6677860314a7951123906dd
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:04:46 2023 -0400
+
+    drop legacy glibc support
+
+commit 95c4b40caf26c2a521055bad2c4cd6e05d9de386
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 14:02:39 2023 -0400
+
+    update minimum dependency version list
+
+commit cc70583beb9862339a37ddf5a6be3c827d8ab977
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 13:59:56 2023 -0400
+
+    drop info on MPK with unsupported kernels
+
+commit 62a98efb13fa9ccadc2ab2351b4151d96ccafcfe
+Author: Daniel Micay <daniel.micay@grapheneos.org>
+Date:   Sat Jun 10 13:59:36 2023 -0400
+
+    update supported Android branch
+
+commit d3152b8e8ff5070f69e7c991d34f32a429e6a894
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 17 12:56:26 2023 -0500
+
+    preserve errno for free calls
+    
+    This is a future POSIX requirement recently implemented by musl and
+    glibc.
+
+commit 2e9daf312249656ef74108f7dd37cebebf936ad9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 17 12:19:47 2023 -0500
+
+    merge fprintf/fputs calls in malloc_info
+
+commit 6038030d0bfd5122bd391bde669998c6e8fdf5cf
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 17 11:48:34 2023 -0500
+
+    no need to check for -fstack-clash-protection
+    
+    This is supported by the compiler versions listed as minimum
+    requirements in the README.
+
+commit 4d23fa37ad579b197b7a18b0210cb75ae898f62c
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 17 11:43:58 2023 -0500
+
+    enable Intel CET support
+
+commit 6d36e758f51d75cbd353e308837eba0894683f09
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 17 11:31:49 2023 -0500
+
+    update copyright notice
+
+commit cd9b875297dfb7144e66f4c93d679952941096e7
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Feb 17 11:31:26 2023 -0500
+
+    reorganize compiler switches
+
+commit 2250130c537fda373a4362cf7727562287eb1168
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Sep 16 01:03:47 2022 -0400
+
+    remove unnecessary UNUSED marker
+
+commit 72dba6765f36576f7e6eda7e93b4ac7677abb674
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Sep 16 00:57:08 2022 -0400
+
+    disable tidy identifier length lint
+
+commit 8f38bbdee6d01cbce0fada8e3b044bd0b01cc7c9
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Wed Sep 14 03:19:23 2022 -0400
+
+    add configuration for self-init
+    
+    This needs to be disabled for compatibility with the exploit protection
+    compatibility mode on GrapheneOS. hardened_malloc shouldn't be trying to
+    initialize itself when exploit protection compatibility mode is enabled.
+    This has to be handled in our Bionic integration instead.
+
+commit dd427cb3b8b51125edf3fba2f2f5afe87a046e65
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 8 23:17:25 2022 -0400
+
+    arm64 page table / page size docs
+
+commit b5dd9d11d9fd404d845025c35e8f086cc6e8d288
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Thu Sep 8 23:12:46 2022 -0400
+
+    raise class region size to 32GB for arm64 Android
+
+commit 72fb3576f568481a03076c62df37984f96bfdfeb
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Tue Aug 16 07:47:26 2022 -0400
+
+    Android 13 is now all we'll be supporting
+
+commit f8fec401c734d85928948f18d7abe76782558d40
+Author: Dmitry Muhomor <muhomor.dmitry@gmail.com>
+Date:   Tue Aug 16 13:35:07 2022 +0300
+
+    update Android.bp for Android 13
+
 commit 19ee16d1950ce0453a19aee3f1c19b9dac48468f
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Sun Jul 10 06:59:33 2022 -0400
@@ -158,6 +438,53 @@ Date:   Sun Apr 10 12:40:11 2022 -0400
 
     readme
 
+commit 0d6d63cbe7cb6326bb06e1161b680cb3229f25a0
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Mar 11 22:03:25 2022 -0500
+
+    improve package installation for CI
+
+commit 8fd31e4bc193f36a7b93342e66da9572800a9259
+Author: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+Date:   Wed Mar 2 17:24:37 2022 +0000
+
+    Bump actions/checkout from 2 to 3
+    
+    Bumps [actions/checkout](https://github.com/actions/checkout) from 2 to 3.
+    - [Release notes](https://github.com/actions/checkout/releases)
+    - [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)
+    - [Commits](https://github.com/actions/checkout/compare/v2...v3)
+    
+    ---
+    updated-dependencies:
+    - dependency-name: actions/checkout
+      dependency-type: direct:production
+      update-type: version-update:semver-major
+    ...
+    
+    Signed-off-by: dependabot[bot] <support@github.com>
+
+commit b511696c555a03b6fc61e47d212e02d1d6554287
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Mon Feb 7 11:54:57 2022 +0100
+
+    clean up includes and remove non-portable includes
+    
+    This marginally increases the portability of hardened_malloc,
+    eg. on OSX.
+
+commit 943704de7c6075d84e61581ad1ce46406426ee00
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Sun Feb 6 22:01:51 2022 +0100
+
+    Remove __pycache__ as well in `make clean`
+
+commit 04a86566c3047d2488e6f0fb3ea34b372de11b9b
+Author: jvoisin <julien.voisin@dustri.org>
+Date:   Fri Jan 28 19:51:00 2022 +0100
+
+    Don't depend on gcc_s
+
 commit a5f0e40e085b1003b47d723965d396d75d38206f
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Jan 27 08:06:58 2022 -0500
@@ -178,6 +505,12 @@ Date:   Thu Jan 27 07:53:11 2022 -0500
     Merge tag '11'
     
     11
+
+commit 448170a4121518b786a25982dd023f0c85281375
+Author: Daniel Micay <danielmicay@gmail.com>
+Date:   Fri Jan 21 23:59:37 2022 -0500
+
+    fix case for non-macro constant
 
 commit 995ce07d4559460b1060991ada7bca1482e4271b
 Author: Daniel Micay <danielmicay@gmail.com>
