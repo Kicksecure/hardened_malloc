@@ -6,9 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <threads.h>
 
-#include <malloc.h>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -62,7 +60,7 @@ static_assert(N_ARENA <= 256, "maximum number of arenas is currently 256");
 
 #if N_ARENA > 1
 __attribute__((tls_model("initial-exec")))
-static thread_local unsigned thread_arena = N_ARENA;
+static _Thread_local unsigned thread_arena = N_ARENA;
 static atomic_uint thread_arena_counter = 0;
 #else
 static const unsigned thread_arena = 0;
@@ -82,7 +80,7 @@ static union {
     char padding[PAGE_SIZE];
 } ro __attribute__((aligned(PAGE_SIZE)));
 
-static inline void *get_slab_region_end() {
+static inline void *get_slab_region_end(void) {
     return atomic_load_explicit(&ro.slab_region_end, memory_order_acquire);
 }
 
@@ -107,15 +105,15 @@ static const size_t min_align = 16;
 #define MIN_SLAB_SIZE_CLASS_SHIFT 4
 
 #if !CONFIG_EXTENDED_SIZE_CLASSES
-static const size_t MAX_SLAB_SIZE_CLASS = 16384;
+static const size_t max_slab_size_class = 16384;
 #define MAX_SLAB_SIZE_CLASS_SHIFT 14
 // limit on the number of cached empty slabs before attempting purging instead
-static const size_t max_empty_slabs_total = MAX_SLAB_SIZE_CLASS * 4;
+static const size_t max_empty_slabs_total = max_slab_size_class * 4;
 #else
-static const size_t MAX_SLAB_SIZE_CLASS = 131072;
+static const size_t max_slab_size_class = 131072;
 #define MAX_SLAB_SIZE_CLASS_SHIFT 17
 // limit on the number of cached empty slabs before attempting purging instead
-static const size_t max_empty_slabs_total = MAX_SLAB_SIZE_CLASS;
+static const size_t max_empty_slabs_total = max_slab_size_class;
 #endif
 
 #if SLAB_QUARANTINE && CONFIG_EXTENDED_SIZE_CLASSES
@@ -660,6 +658,7 @@ static void enqueue_free_slab(struct size_class *c, struct slab_metadata *metada
     c->free_slabs_tail = substitute;
 }
 
+// preserves errno
 static inline void deallocate_small(void *p, const size_t *expected_size) {
     struct slab_size_class_info size_class_info = slab_size_class(p);
     size_t class = size_class_info.class;
@@ -772,6 +771,7 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
         metadata->prev = NULL;
 
         if (c->empty_slabs_total + slab_size > max_empty_slabs_total) {
+            int saved_errno = errno;
             if (!memory_map_fixed(slab, slab_size)) {
                 label_slab(slab, slab_size, class);
                 stats_slab_deallocate(c, slab_size);
@@ -780,6 +780,7 @@ static inline void deallocate_small(void *p, const size_t *expected_size) {
                 return;
             }
             memory_purge(slab, slab_size);
+            errno = saved_errno;
             // handle out-of-memory by putting it into the empty slabs list
         }
 
@@ -1185,11 +1186,13 @@ static inline unsigned init(void) {
     return arena;
 }
 
+#if CONFIG_SELF_INIT
 // trigger early initialization to set up pthread_atfork and protect state as soon as possible
 COLD __attribute__((constructor(101))) static void trigger_early_init(void) {
     // avoid calling init directly to skip it if this isn't the malloc implementation
     h_free(h_malloc(16));
 }
+#endif
 
 // Returns 0 on overflow.
 static size_t get_large_size_class(size_t size) {
@@ -1243,7 +1246,7 @@ static void *allocate_large(size_t size) {
 }
 
 static inline void *allocate(unsigned arena, size_t size) {
-    return size <= MAX_SLAB_SIZE_CLASS ? allocate_small(arena, size) : allocate_large(size);
+    return size <= max_slab_size_class ? allocate_small(arena, size) : allocate_large(size);
 }
 
 static void deallocate_large(void *p, const size_t *expected_size) {
@@ -1275,7 +1278,7 @@ static int allocate_aligned(unsigned arena, void **memptr, size_t alignment, siz
     }
 
     if (alignment <= PAGE_SIZE) {
-        if (size <= MAX_SLAB_SIZE_CLASS && alignment > min_align) {
+        if (size <= max_slab_size_class && alignment > min_align) {
             size = get_size_info_align(size, alignment).size;
         }
 
@@ -1316,7 +1319,7 @@ static int allocate_aligned(unsigned arena, void **memptr, size_t alignment, siz
 }
 
 static size_t adjust_size_for_canary(size_t size) {
-    if (size > 0 && size <= MAX_SLAB_SIZE_CLASS) {
+    if (size > 0 && size <= max_slab_size_class) {
         return size + canary_size;
     }
     return size;
@@ -1362,7 +1365,7 @@ EXPORT void *h_calloc(size_t nmemb, size_t size) {
     }
     total_size = adjust_size_for_canary(total_size);
     void *p = alloc(total_size);
-    if (!ZERO_ON_FREE && likely(p != NULL) && total_size && total_size <= MAX_SLAB_SIZE_CLASS) {
+    if (!ZERO_ON_FREE && likely(p != NULL) && total_size && total_size <= max_slab_size_class) {
         memset(p, 0, total_size - canary_size);
     }
     return p;
@@ -1374,7 +1377,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
         return alloc(size);
     }
 
-    if (size > MAX_SLAB_SIZE_CLASS) {
+    if (size > max_slab_size_class) {
         size = get_large_size_class(size);
         if (unlikely(!size)) {
             errno = ENOMEM;
@@ -1385,7 +1388,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
     size_t old_size;
     if (old < get_slab_region_end() && old >= ro.slab_region_start) {
         old_size = slab_usable_size(old);
-        if (size <= MAX_SLAB_SIZE_CLASS && get_size_info(size).size == old_size) {
+        if (size <= max_slab_size_class && get_size_info(size).size == old_size) {
             return old;
         }
         thread_unseal_metadata();
@@ -1409,7 +1412,7 @@ EXPORT void *h_realloc(void *old, size_t size) {
         }
         mutex_unlock(&ra->lock);
 
-        if (size > MAX_SLAB_SIZE_CLASS) {
+        if (size > max_slab_size_class) {
             // in-place shrink
             if (size < old_size) {
                 void *new_end = (char *)old + size;
@@ -1490,17 +1493,17 @@ EXPORT void *h_realloc(void *old, size_t size) {
         }
     }
 
-    void *new = allocate(thread_arena, size);
+    void *new = allocate(init(), size);
     if (new == NULL) {
         thread_seal_metadata();
         return NULL;
     }
     size_t copy_size = min(size, old_size);
-    if (copy_size > 0 && copy_size <= MAX_SLAB_SIZE_CLASS) {
+    if (copy_size > 0 && copy_size <= max_slab_size_class) {
         copy_size -= canary_size;
     }
     memcpy(new, old, copy_size);
-    if (old_size <= MAX_SLAB_SIZE_CLASS) {
+    if (old_size <= max_slab_size_class) {
         deallocate_small(old, NULL);
     } else {
         deallocate_large(old, NULL);
@@ -1534,6 +1537,7 @@ EXPORT void *h_pvalloc(size_t size) {
 }
 #endif
 
+// preserves errno
 EXPORT void h_free(void *p) {
     if (p == NULL) {
         return;
@@ -1546,7 +1550,9 @@ EXPORT void h_free(void *p) {
         return;
     }
 
+    int saved_errno = errno;
     deallocate_large(p, NULL);
+    errno = saved_errno;
 
     thread_seal_metadata();
 }
@@ -1802,24 +1808,18 @@ EXPORT int h_malloc_trim(UNUSED size_t pad) {
 
 EXPORT void h_malloc_stats(void) {}
 
+#if defined(__GLIBC__) || defined(__ANDROID__)
 // glibc mallinfo is broken and replaced with mallinfo2
 #if defined(__GLIBC__)
 EXPORT struct mallinfo h_mallinfo(void) {
     return (struct mallinfo){0};
 }
 
-#if __GLIBC_PREREQ(2, 33)
-#define HAVE_MALLINFO2
-#endif
-#endif
-
-#if defined(HAVE_MALLINFO2) || defined(__ANDROID__)
-#ifndef __GLIBC__
-EXPORT struct mallinfo h_mallinfo(void) {
-    struct mallinfo info = {0};
-#else
 EXPORT struct mallinfo2 h_mallinfo2(void) {
     struct mallinfo2 info = {0};
+#else
+EXPORT struct mallinfo h_mallinfo(void) {
+    struct mallinfo info = {0};
 #endif
 
 #if CONFIG_STATS
@@ -1857,7 +1857,7 @@ EXPORT struct mallinfo2 h_mallinfo2(void) {
 #endif
 
 #ifndef __ANDROID__
-EXPORT int h_malloc_info(int options, UNUSED FILE *fp) {
+EXPORT int h_malloc_info(int options, FILE *fp) {
     if (options) {
         errno = EINVAL;
         return -1;
@@ -1883,12 +1883,13 @@ EXPORT int h_malloc_info(int options, UNUSED FILE *fp) {
                 mutex_unlock(&c->lock);
 
                 if (nmalloc || ndalloc || slab_allocated || allocated) {
-                    fprintf(fp, "<bin nr=\"%u\" size=\"%" PRIu32 "\">", class, size_classes[class]);
-                    fprintf(fp, "<nmalloc>%" PRIu64 "</nmalloc>", nmalloc);
-                    fprintf(fp, "<ndalloc>%" PRIu64 "</ndalloc>", ndalloc);
-                    fprintf(fp, "<slab_allocated>%zu</slab_allocated>", slab_allocated);
-                    fprintf(fp, "<allocated>%zu</allocated>", allocated);
-                    fputs("</bin>", fp);
+                    fprintf(fp, "<bin nr=\"%u\" size=\"%" PRIu32 "\">"
+                            "<nmalloc>%" PRIu64 "</nmalloc>"
+                            "<ndalloc>%" PRIu64 "</ndalloc>"
+                            "<slab_allocated>%zu</slab_allocated>"
+                            "<allocated>%zu</allocated>"
+                            "</bin>", class, size_classes[class], nmalloc, ndalloc, slab_allocated,
+                            allocated);
                 }
             }
 
@@ -1900,9 +1901,9 @@ EXPORT int h_malloc_info(int options, UNUSED FILE *fp) {
         size_t region_allocated = ra->allocated;
         mutex_unlock(&ra->lock);
 
-        fprintf(fp, "<heap nr=\"%u\">", N_ARENA);
-        fprintf(fp, "<allocated_large>%zu</allocated_large>", region_allocated);
-        fputs("</heap>", fp);
+        fprintf(fp, "<heap nr=\"%u\">"
+                "<allocated_large>%zu</allocated_large>"
+                "</heap>", N_ARENA, region_allocated);
 
         thread_seal_metadata();
     }

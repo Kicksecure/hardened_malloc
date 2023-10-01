@@ -14,13 +14,14 @@ endif
 OUT := out$(SUFFIX)
 
 define safe_flag
-$(shell $(CC) $(if $(filter clang,$(CC)),-Werror=unknown-warning-option) -E $1 - </dev/null >/dev/null 2>&1 && echo $1 || echo $2)
+$(shell $(CC) $(if $(filter clang%,$(CC)),-Werror=unknown-warning-option) -E $1 - </dev/null >/dev/null 2>&1 && echo $1 || echo $2)
 endef
 
 CPPFLAGS := $(CPPFLAGS) -D_GNU_SOURCE -I include
-SHARED_FLAGS := -O3 -flto -fPIC -fvisibility=hidden -fno-plt \
-    $(call safe_flag,-fstack-clash-protection) -fstack-protector-strong -pipe -Wall -Wextra \
-    $(call safe_flag,-Wcast-align=strict,-Wcast-align) -Wcast-qual -Wwrite-strings
+SHARED_FLAGS := -pipe -O3 -flto -fPIC -fvisibility=hidden -fno-plt \
+    -fstack-clash-protection $(call safe_flag,-fcf-protection) -fstack-protector-strong \
+    -Wall -Wextra $(call safe_flag,-Wcast-align=strict,-Wcast-align) -Wcast-qual -Wwrite-strings \
+    -Wundef
 
 ifeq ($(CONFIG_WERROR),true)
     SHARED_FLAGS += -Werror
@@ -34,7 +35,7 @@ ifeq ($(CONFIG_UBSAN),true)
     SHARED_FLAGS += -fsanitize=undefined -fno-sanitize-recover=undefined
 endif
 
-CFLAGS := $(CFLAGS) -std=c17 $(SHARED_FLAGS) -Wmissing-prototypes
+CFLAGS := $(CFLAGS) -std=c17 $(SHARED_FLAGS) -Wmissing-prototypes -Wstrict-prototypes
 CXXFLAGS := $(CXXFLAGS) -std=c++17 -fsized-deallocation $(SHARED_FLAGS)
 LDFLAGS := $(LDFLAGS) -Wl,-O1,--as-needed,-z,defs,-z,relro,-z,now,-z,nodlopen,-z,text
 
@@ -44,7 +45,7 @@ OBJECTS := $(SOURCES:.c=.o)
 ifeq ($(CONFIG_CXX_ALLOCATOR),true)
     # make sure LTO is compatible in case CC and CXX don't match (such as clang and g++)
     CXX := $(CC)
-    LDLIBS += -lstdc++ -lgcc_s
+    LDLIBS += -lstdc++
 
     SOURCES += new.cc
     OBJECTS += new.o
@@ -84,6 +85,10 @@ ifeq (,$(filter $(CONFIG_STATS),true false))
     $(error CONFIG_STATS must be true or false)
 endif
 
+ifeq (,$(filter $(CONFIG_SELF_INIT),true false))
+    $(error CONFIG_SELF_INIT must be true or false)
+endif
+
 CPPFLAGS += \
     -DCONFIG_SEAL_METADATA=$(CONFIG_SEAL_METADATA) \
     -DZERO_ON_FREE=$(CONFIG_ZERO_ON_FREE) \
@@ -102,7 +107,8 @@ CPPFLAGS += \
     -DFREE_SLABS_QUARANTINE_RANDOM_LENGTH=$(CONFIG_FREE_SLABS_QUARANTINE_RANDOM_LENGTH) \
     -DCONFIG_CLASS_REGION_SIZE=$(CONFIG_CLASS_REGION_SIZE) \
     -DN_ARENA=$(CONFIG_N_ARENA) \
-    -DCONFIG_STATS=$(CONFIG_STATS)
+    -DCONFIG_STATS=$(CONFIG_STATS) \
+    -DCONFIG_SELF_INIT=$(CONFIG_SELF_INIT)
 
 $(OUT)/libhardened_malloc$(SUFFIX).so: $(OBJECTS) | $(OUT)
 	$(CC) $(CFLAGS) $(LDFLAGS) -shared $^ $(LDLIBS) -o $@

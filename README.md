@@ -65,12 +65,14 @@ used instead as this allocator fundamentally doesn't support that environment.
 
 ## Dependencies
 
-Debian stable (currently Debian 11) determines the most ancient set of
+Debian stable (currently Debian 12) determines the most ancient set of
 supported dependencies:
 
-* glibc 2.31
-* Linux 5.10
-* Clang 11.0.1 or GCC 10.2.1
+* glibc 2.36
+* Linux 6.1
+* Clang 14.0.6 or GCC 12.2.0
+
+For Android, the Linux GKI 5.10, 5.15 and 6.1 branches are supported.
 
 However, using more recent releases is highly recommended. Older versions of
 the dependencies may be compatible at the moment but are not tested and will
@@ -81,14 +83,7 @@ there will be custom integration offering better performance in the future
 along with other hardening for the C standard library implementation.
 
 For Android, only the current generation, actively developed maintenance branch of the Android
-Open Source Project will be supported, which currently means `android12-release`.
-
-The Linux kernel's implementation of Memory Protection Keys was severely broken
-before Linux 5.0. The `CONFIG_SEAL_METADATA` feature should only be enabled for
-use on kernels newer than 5.0 or longterm branches with a backport of the [fix
-for the
-issue](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=a31e184e4f69965c99c04cc5eb8a4920e0c63737).
-This issue was discovered and reported by the hardened\_malloc project.
+Open Source Project will be supported, which currently means `android13-qpr2-release`.
 
 ## Testing
 
@@ -178,6 +173,13 @@ large number of guard pages created by hardened\_malloc. As an example, in
 
 This is unnecessary if you set `CONFIG_GUARD_SLABS_INTERVAL` to a very large
 value in the build configuration.
+
+On arm64, make sure your kernel is configured to use 4k pages since we haven't
+yet added support for 16k and 64k pages. The kernel also has to be configured
+to use 4 level page tables for the full 48 bit address space instead of only
+having a 39 bit address space for the default hardened\_malloc configuration.
+It's possible to reduce the class region size substantially to make a 39 bit
+address space workable but the defaults won't work.
 
 ## Configuration
 
