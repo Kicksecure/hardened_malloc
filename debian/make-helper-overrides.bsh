@@ -5,9 +5,20 @@
 
 version_numbers_by_upstream=true
 
+## https://github.com/GrapheneOS/hardened_malloc/issues/86
+genmkfile_lintian_post_opts+=" --suppress-tags sharedobject-in-library-directory-missing-soname"
+
+genmkfile_file_has_been_copied=true
+
+## This is only used when manually compiling and installing.
 make_install_hook_post() {
    if [ ! -d "$DESTDIR/usr/lib" ]; then
-      mkdir --parents "$DESTDIR/usr/lib/libhardened_malloc.so"
+      mkdir --parents "$DESTDIR/lib/x86_64-linux-gnu"
    fi
-   cp libhardened_malloc.so "$DESTDIR/usr/lib/libhardened_malloc.so/libhardened_malloc.so"
+
+   cp libhardened_malloc.so "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc.so"
+   chmod u+s "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc.so"
+
+   cp libhardened_malloc-light.so "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc-light.so"
+   chmod u+s "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc-light.so"
 }
