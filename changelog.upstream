@@ -1,3 +1,23 @@
+commit e9dca0fc2f757ee1c18e8f544a8e47c239ad7a45
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Thu Dec 21 10:58:00 2023 -0500
+
+    fix: allow hardened malloc to be used by `setuid` programs
+    
+    - no longer use full path names to hardened malloc library
+    - `set-user-id` hardened malloc library (`setuid`)
+    
+    credit to @SkewedZeppelin for research:
+    https://gist.github.com/SkewedZeppelin/7f293d64c1c651bdc21526519d9e192b
+    
+    https://forums.whonix.org/t/hardened-malloc-hardened-memory-allocator/7474/224
+
+commit 8e5e9813bff6b76e697eaf45a36be9bb9a545281
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Sun Oct 1 10:37:52 2023 -0400
+
+    bumped changelog version
+
 commit f2ea84a719818256870bd63d23622229e40c4c95
 Merge: 8a94c76 903cba5
 Author: Patrick Schleizer <adrelanos@whonix.org>
