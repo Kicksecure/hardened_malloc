@@ -24,12 +24,18 @@ if test -f /etc/ld.so.preload ; then
    file_name="/etc/ld.so.preload"
    LANG=C str_replace "$search" "$replace" "$file_name" || true
 
+   search="libhardened_malloc_kicksecure.so"
+   replace="libhardened_malloc-light.so"
+   file_name="/etc/ld.so.preload"
+   LANG=C str_replace "$search" "$replace" "$file_name" || true
+
    ## Should not use full path.
    ## https://gist.github.com/SkewedZeppelin/7f293d64c1c651bdc21526519d9e192b
    search="/usr/lib/libhardened_malloc.so/libhardened_malloc-light.so"
    replace="libhardened_malloc-light.so"
    file_name="/etc/ld.so.preload"
    LANG=C str_replace "$search" "$replace" "$file_name" || true
+
    search="/usr/lib/libhardened_malloc.so/libhardened_malloc.so"
    replace="libhardened_malloc.so"
    file_name="/etc/ld.so.preload"
