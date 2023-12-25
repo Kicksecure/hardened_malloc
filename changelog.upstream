@@ -1,3 +1,41 @@
+commit 262eb51f4c98e956f1a5ce3925ced959cb42ef90
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 12:30:18 2023 -0500
+
+    add compatibility symlinks to avoid errors messages during upgrade
+
+commit 3a6dcfdd530b57514d6cd56fec2ece2117d8b342
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 12:22:11 2023 -0500
+
+    remove empty transitional package hardened-malloc-kicksecure-enable
+    
+    was replaced by hardened-malloc-light-enable
+
+commit c90094e92cba8a77db98959b4dd3a9eb9fdb2a7b
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 12:21:42 2023 -0500
+
+    wrap
+
+commit 6114e4bc95c778b66e2f0b05440184db5ab06a18
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 12:20:20 2023 -0500
+
+    wrap-and-sort -a
+
+commit d2697e65f6d6324c5d418a007736461b01d1ba94
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 12:18:49 2023 -0500
+
+    wrap-and-sort
+
+commit f4ea0f076de751d5705e4e388b1f57628dd39775
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 17:15:38 2023 +0000
+
+    bumped changelog version
+
 commit cca91c489ef31b2a975c9a3742a1227898b1f20f
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Mon Dec 25 12:10:04 2023 -0500
