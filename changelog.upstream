@@ -1,3 +1,30 @@
+commit a55725c5f104da18e939271250d5a90117088ee9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 11:25:32 2023 -0500
+
+    more legacy file path migration
+
+commit 82555352cebdb54d8700901bfbc2427fb86aaf8a
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 11:22:27 2023 -0500
+
+    fix: remove legacy path migration code from hardened-malloc-light-enable to hardened-malloc
+    
+    so also users who manually enabled Hardened Malloc are covered
+    not only these who used hardened-malloc-light-enable
+
+commit b3c49c186fb0fe5155071540348c314e3577b0d9
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Mon Dec 25 11:16:43 2023 -0500
+
+    fix: update to new path so /etc/ld.so.preload entry is removed on uninstallation
+
+commit b3805a57a8b091f542b10679ccc34ebc04a1ea99
+Author: Patrick Schleizer <adrelanos@whonix.org>
+Date:   Fri Dec 22 16:30:58 2023 +0000
+
+    bumped changelog version
+
 commit e9dca0fc2f757ee1c18e8f544a8e47c239ad7a45
 Author: Patrick Schleizer <adrelanos@whonix.org>
 Date:   Thu Dec 21 10:58:00 2023 -0500
