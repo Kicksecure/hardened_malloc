@@ -64,16 +64,3 @@ Description: enables Hardened Malloc Light
  re-enable the Hardened Malloc Light.
  .
  Other than doing that this is an empty package.
-
-Package: hardened-malloc-kicksecure-enable
-Architecture: amd64
-Depends: hardened-malloc-light-enable,
-         ${misc:Depends},
-         ${shlibs:Depends}
-Section: oldlibs
-Description: transitional package
- This is a transitional package. It can safely be removed.
- .
- Legacy.
- .
- Other than doing that this is an empty package.
