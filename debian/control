@@ -19,7 +19,8 @@ Rules-Requires-Root: no
 
 Package: hardened-malloc
 Architecture: amd64
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
 Description: security-focused general purpose memory allocator
  This is a security-focused general purpose memory allocator providing the
  malloc API along with various extensions. It provides substantial hardening
@@ -46,7 +47,10 @@ Package: hardened-malloc-light-enable
 ## Actually is 'Architecture: all' but genmkfile cannot handle that a package
 ## being a mix of 'Architecture: any' and 'Architecture: all' yet.
 Architecture: amd64
-Depends: hardened-malloc, helper-scripts, ${misc:Depends}, ${shlibs:Depends}
+Depends: hardened-malloc,
+         helper-scripts,
+         ${misc:Depends},
+         ${shlibs:Depends}
 Replaces: hardened-malloc-kicksecure-enable
 Provides: hardened-malloc-kicksecure-enable
 Description: enables Hardened Malloc Light
@@ -61,7 +65,9 @@ Description: enables Hardened Malloc Light
 
 Package: hardened-malloc-kicksecure-enable
 Architecture: amd64
-Depends: hardened-malloc-light-enable, ${misc:Depends}, ${shlibs:Depends}
+Depends: hardened-malloc-light-enable,
+         ${misc:Depends},
+         ${shlibs:Depends}
 Section: oldlibs
 Description: transitional package
  This is a transitional package. It can safely be removed.
