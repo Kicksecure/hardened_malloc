@@ -13,12 +13,12 @@ genmkfile_file_has_been_copied=true
 ## This is only used when manually compiling and installing.
 make_install_hook_post() {
    if [ ! -d "$DESTDIR/usr/lib" ]; then
-      mkdir --parents "$DESTDIR/lib/x86_64-linux-gnu"
+      mkdir --parents "$DESTDIR/usr/lib/x86_64-linux-gnu"
    fi
 
-   cp libhardened_malloc.so "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc.so"
-   chmod u+s "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc.so"
+   cp libhardened_malloc.so "$DESTDIR/usr/lib/x86_64-linux-gnu/libhardened_malloc.so"
+   chmod u+s "$DESTDIR/usr/lib/x86_64-linux-gnu/libhardened_malloc.so"
 
-   cp libhardened_malloc-light.so "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc-light.so"
-   chmod u+s "$DESTDIR/lib/x86_64-linux-gnu/libhardened_malloc-light.so"
+   cp libhardened_malloc-light.so "$DESTDIR/usr/lib/x86_64-linux-gnu/libhardened_malloc-light.so"
+   chmod u+s "$DESTDIR/usr/lib/x86_64-linux-gnu/libhardened_malloc-light.so"
 }

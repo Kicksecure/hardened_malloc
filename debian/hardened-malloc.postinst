@@ -42,8 +42,8 @@ if test -f /etc/ld.so.preload ; then
    LANG=C str_replace "$search" "$replace" "$file_name" || true
 fi
 
-chmod u+s /lib/x86_64-linux-gnu/libhardened_malloc.so
-chmod u+s /lib/x86_64-linux-gnu/libhardened_malloc-light.so
+chmod u+s /usr/lib/x86_64-linux-gnu/libhardened_malloc.so
+chmod u+s /usr/lib/x86_64-linux-gnu/libhardened_malloc-light.so
 
 true "INFO: debhelper beginning here."
 

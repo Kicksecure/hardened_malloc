@@ -30,8 +30,8 @@ Description: security-focused general purpose memory allocator
  .
  Ships two files:
  .
-  * [1] /usr/lib/libhardened_malloc.so/libhardened_malloc.so
-  * [2] /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so
+  * [1] /usr/lib/x86_64-linux-gnu/libhardened_malloc.so/libhardened_malloc.so
+  * [2] /usr/lib/x86_64-linux-gnu/libhardened_malloc.so/libhardened_malloc-light.so
  .
  [1] Was compiled with Hardened Malloc Default compilation parameters.
  .
@@ -45,7 +45,7 @@ Depends: hardened-malloc, helper-scripts, ${shlibs:Depends}, ${misc:Depends}
 Replaces: hardened-malloc-kicksecure-enable
 Provides: hardened-malloc-kicksecure-enable
 Description: enables Hardened Malloc Light
- Adds /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so to
+ Adds libhardened_malloc-light.so to
  /etc/ld.so.preload systemd wide configuration file.
  .
  Does this only once per installation. The user is free to undo changes to

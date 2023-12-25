@@ -3,5 +3,5 @@
 ## Copyright (C) 2019 - 2023 ENCRYPTED SUPPORT LP <adrelanos@whonix.org>
 ## See the file COPYING for copying conditions.
 
-out/libhardened_malloc.so => /lib/x86_64-linux-gnu/libhardened_malloc.so
-out-light/libhardened_malloc-light.so => /lib/x86_64-linux-gnu/libhardened_malloc-light.so
+out/libhardened_malloc.so => /usr/lib/x86_64-linux-gnu/libhardened_malloc.so
+out-light/libhardened_malloc-light.so => /usr/lib/x86_64-linux-gnu/libhardened_malloc-light.so
