@@ -15,6 +15,27 @@ true "
 #####################################################################
 "
 
+## legacy
+if test -f /etc/ld.so.preload ; then
+   ## forked libhardened_malloc_kicksecure.so was renamed to
+   ## original (unforked) upstream provided libhardened_malloc-light.so
+   search="/usr/lib/libhardened_malloc.so/libhardened_malloc_kicksecure.so"
+   replace="/usr/lib/libhardened_malloc.so/libhardened_malloc-light.so"
+   file_name="/etc/ld.so.preload"
+   LANG=C str_replace "$search" "$replace" "$file_name" || true
+
+   ## Should not use full path.
+   ## https://gist.github.com/SkewedZeppelin/7f293d64c1c651bdc21526519d9e192b
+   search="/usr/lib/libhardened_malloc.so/libhardened_malloc-light.so"
+   replace="libhardened_malloc-light.so"
+   file_name="/etc/ld.so.preload"
+   LANG=C str_replace "$search" "$replace" "$file_name" || true
+   search="/usr/lib/libhardened_malloc.so/libhardened_malloc.so"
+   replace="libhardened_malloc.so"
+   file_name="/etc/ld.so.preload"
+   LANG=C str_replace "$search" "$replace" "$file_name" || true
+fi
+
 chmod u+s /lib/x86_64-linux-gnu/libhardened_malloc.so
 chmod u+s /lib/x86_64-linux-gnu/libhardened_malloc-light.so
 
