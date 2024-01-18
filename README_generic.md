@@ -14,8 +14,10 @@ It can be added as a preloaded library using /etc/ld.so.preload.
 
 Ships two files:
 
-* [1] /usr/lib/libhardened_malloc.so/libhardened_malloc.so
-* [2] /usr/lib/libhardened_malloc.so/libhardened_malloc-light.so
+* [1]
+/usr/lib/x86_64-linux-gnu/libhardened_malloc.so/libhardened_malloc.so
+* [2]
+/usr/lib/x86_64-linux-gnu/libhardened_malloc.so/libhardened_malloc-light.so
 
 [1] Was compiled with Hardened Malloc Default compilation parameters.
 
